@@ -8,7 +8,7 @@ class MainSDLWindow{
 
         int Init(const char* window_name, int width, int height);
 
-        void WaitForClosing();
+        void MainLoop(Uint32 framerate);
 
         SDL_Renderer* GetRenderer(void);
 

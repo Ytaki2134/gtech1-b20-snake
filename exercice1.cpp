@@ -11,13 +11,44 @@ MainSDLWindow::~MainSDLWindow(void){
     SDL_Quit();
 }
 
-void MainSDLWindow::WaitForClosing(){
+void MainSDLWindow::MainLoop(Uint32 framerate){
     SDL_Event event;
+    SDL_Renderer* renderer = this->GetRenderer();
+    SDL_Rect snake_head = {300, 300, 50, 50}; 
     while (true){
+        Uint32 frame_time_start = SDL_GetTicks();
+
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+        SDL_RenderClear(renderer);
+        
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
                 return;
-        }   
+            if (event.type == SDL_KEYDOWN){
+                if (event.key.keysym.scancode == SDL_SCANCODE_DOWN){
+                    snake_head.y += 20; 
+                }
+                if (event.key.keysym.scancode == SDL_SCANCODE_UP){
+                    snake_head.y -= 20; 
+                }
+                if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT){
+                    snake_head.x += 20; 
+                }
+                if (event.key.keysym.scancode == SDL_SCANCODE_LEFT){
+                    snake_head.x -= 20; 
+                }
+            }
+        }
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(renderer, &snake_head);
+        SDL_RenderPresent(renderer);
+        
+        Uint32 time_since_frame_start = SDL_GetTicks() - frame_time_start;
+        if (time_since_frame_start < framerate){
+            SDL_Delay(framerate - time_since_frame_start);
+        }
     }
     
 }
@@ -52,9 +83,10 @@ SDL_Renderer* MainSDLWindow::GetRenderer(void){
 }
 
 int main(void){
-    
+    Uint32 frame_rate = 20;
 
     MainSDLWindow main_window;
-    main_window.Init("test", 600, 600);
-    main_window.WaitForClosing();
+    main_window.Init("Snake", 600, 600);
+    main_window.MainLoop(frame_rate);
+    return 0;
 }
