@@ -13,14 +13,12 @@ MainSDLWindow::~MainSDLWindow(void){
 
 void MainSDLWindow::MainLoop(Uint32 framerate){
     SDL_Event event;
-    SDL_Renderer* renderer = this->GetRenderer();
     SDL_Rect snake_head = {300, 300, 50, 50}; 
     while (true){
         Uint32 frame_time_start = SDL_GetTicks();
 
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-        SDL_RenderClear(renderer);
+        SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
+        SDL_RenderClear(this->renderer);
         
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
@@ -41,9 +39,9 @@ void MainSDLWindow::MainLoop(Uint32 framerate){
             }
         }
 
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderDrawRect(renderer, &snake_head);
-        SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 255);
+        SDL_RenderDrawRect(this->renderer, &snake_head);
+        SDL_RenderPresent(this->renderer);
         
         Uint32 time_since_frame_start = SDL_GetTicks() - frame_time_start;
         if (time_since_frame_start < framerate){
