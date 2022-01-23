@@ -31,7 +31,7 @@ class Segment{
 
 class Snake{
     public:
-        Snake(int starting_row, int starting_col, Direction starting_direction);
+        Snake(int starting_row, int starting_col, Direction starting_direction, int length);
 
         ~Snake();
 

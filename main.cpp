@@ -10,7 +10,7 @@ int main(void){
 
     SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
     SDL_Event event;
-    Snake* mainSnake = new Snake(25, 25, RIGHT);
+    Snake* mainSnake = new Snake(25, 25, RIGHT, 10);
     while (true){
         Uint32 frameTimeStart = SDL_GetTicks();
 

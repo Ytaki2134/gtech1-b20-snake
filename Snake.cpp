@@ -35,9 +35,27 @@ void Segment::SetDirection(Direction newDirection){
     direction = newDirection;
 }
 
-Snake::Snake(int startingRow, int startingCol, Direction startingDirection){
-    head = new Segment(startingRow, startingCol, startingDirection, nullptr);
-    
+Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
+
+    Segment* segment = NULL;
+    for(int i=length-1;i>0;i--){
+        switch (startingDirection){
+            case RIGHT:
+                segment = new Segment(startingRow, startingCol-i, startingDirection, segment);
+                break;
+            case LEFT:
+                segment = new Segment(startingRow, startingCol+i, startingDirection, segment);
+                break;
+            case DOWN:
+                segment = new Segment(startingRow-i, startingCol, startingDirection, segment);
+                break;
+            case UP:
+                segment = new Segment(startingRow+i, startingCol, startingDirection, segment);
+                break;
+        }
+    }
+
+    head = new Segment(startingRow, startingCol, startingDirection, segment);
 }
 
 Snake::~Snake(){

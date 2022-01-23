@@ -5,7 +5,6 @@ class MainSDLWindow{
   +MainSDLWindow()
   +~MainSDLWindow()
   +SDL_Renderer* : GenRenderer()
-  +void : MainLoop(Uint32 framerate)
   +int : Init(const char* window_name, int width, int height)
 }
 @enduml
