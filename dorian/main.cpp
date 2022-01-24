@@ -6,7 +6,11 @@ int main(void){
     int windowSize = 600;
 
     MainSDLWindow* mainWindow = new MainSDLWindow();
-    mainWindow->Init("Snake", 600, 600);
+    bool failed_init = mainWindow->Init("Snake", 600, 600);
+
+    if(failed_init){
+        return 1;
+    }
 
     SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
     SDL_Event event;
@@ -38,7 +42,7 @@ int main(void){
             }
         }
         
-        mainSnake->draw(mainWindowRenderer, windowSize/100);
+        mainSnake->draw(mainWindow, windowSize/100);
         SDL_RenderPresent(mainWindowRenderer);
         
         Uint32 timeSinceFrameStart = SDL_GetTicks() - frameTimeStart;

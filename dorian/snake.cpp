@@ -1,4 +1,5 @@
 #include "snake.hpp"
+#include "MainSDLWindow.hpp"
 
 Segment::Segment(int row, int col, Direction direction, Segment* next){
     this->row = row;
@@ -104,11 +105,14 @@ void Snake::Move(){
     }
 }
 
-void Snake::draw(SDL_Renderer* mainWindowRenderer, int tile_size){
+void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
     Segment* actual_segment = head;
     while(actual_segment != nullptr)
     {
+        SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
+        SDL_Rect* playground = mainWindow->GetPlayground();
         SDL_SetRenderDrawColor(mainWindowRenderer, 255, 255, 255, 255);
+        SDL_RenderSetViewport(mainWindowRenderer, playground);
         SDL_Rect rectToDraw = {actual_segment->GetCol()*tile_size, actual_segment->GetRow()*tile_size, tile_size, tile_size};
         SDL_RenderDrawRect(mainWindowRenderer, &rectToDraw);
         actual_segment = actual_segment->GetNext();

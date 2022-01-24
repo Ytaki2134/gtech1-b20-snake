@@ -12,10 +12,13 @@ class MainSDLWindow{
         int Init(const char* window_name, int width, int height);
 
         SDL_Renderer* GetRenderer(void);
+        SDL_Rect* GetPlayground(void);
 
     private:
         SDL_Window* window;
         SDL_Renderer* renderer;
+        SDL_Rect scoreZone;
+        SDL_Rect playground;
 };
 
 #endif
