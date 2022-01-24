@@ -64,7 +64,13 @@ Snake::~Snake(){
 }
 
 void Snake::ChangeDirection(Direction newDirection){
-    head->SetDirection(newDirection);
+    Direction current_direction = head->GetDirection();
+    if((newDirection == LEFT and current_direction != RIGHT) || (newDirection == RIGHT and current_direction != LEFT)){
+        head->SetDirection(newDirection);
+    }
+    else if((newDirection == UP and current_direction != DOWN) || (newDirection == DOWN and current_direction != UP)){
+        head->SetDirection(newDirection);
+    }
 }
 
 void Snake::Move(){
