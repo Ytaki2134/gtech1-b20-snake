@@ -9,6 +9,7 @@ class Fruits {
     private :
         int row;
         int col;
+        char color;
 };
 
 #endif
