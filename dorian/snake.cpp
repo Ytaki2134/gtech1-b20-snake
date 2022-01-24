@@ -1,4 +1,4 @@
-#include "Snake.hpp"
+#include "snake.hpp"
 
 Segment::Segment(int row, int col, Direction direction, Segment* next){
     this->row = row;
