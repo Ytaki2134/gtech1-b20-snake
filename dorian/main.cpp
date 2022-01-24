@@ -1,5 +1,5 @@
 #include "MainSDLWindow.hpp"
-#include "Snake.hpp"
+#include "snake.hpp"
 
 int main(void){
     Uint32 framerate = 20;
