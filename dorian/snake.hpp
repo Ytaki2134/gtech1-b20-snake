@@ -4,9 +4,12 @@
 #include <SDL2/SDL.h>
 #include "MainSDLWindow.hpp"
 
+
 typedef enum{
     DOWN, UP, RIGHT, LEFT
 } Direction;
+
+class Playground;
 
 class Segment{
     public :
@@ -36,9 +39,11 @@ class Snake{
 
         ~Snake();
 
-        void Move();
+        bool Move(Playground* playground);
 
         void ChangeDirection(Direction newDirection);
+
+        bool TestCollisions(Playground* playground);
 
         void draw(MainSDLWindow* mainWindow, int tile_size);
 

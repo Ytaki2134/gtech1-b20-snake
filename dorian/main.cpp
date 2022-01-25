@@ -1,27 +1,42 @@
 #include "MainSDLWindow.hpp"
 #include "snake.hpp"
+#include "score.hpp"
+#include "scorerenderer.hpp"
+#include "playground.hpp"
 
 int main(void){
     Uint32 framerate = 20;
-    int windowSize = 600;
+    int windowSize = 800;
+    int tile_size = 10; 
+    bool gameContinues = true;
 
     MainSDLWindow* mainWindow = new MainSDLWindow();
-    bool failed_init = mainWindow->Init("Snake", 600, 600);
-
-    if(failed_init){
+    bool failedInit = mainWindow->Init("Snake", 800, 800);
+    if(failedInit){
         return 1;
     }
 
     SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
     SDL_Event event;
+
     Snake* mainSnake = new Snake(25, 25, RIGHT, 10);
-    while (true){
+
+    Playground* playground = new Playground(mainWindow->GetPlaygroundZone().w/tile_size, mainWindow->GetPlaygroundZone().h/tile_size);
+    
+    Score* score = new Score();
+    ScoreGraphics* scoreGraphics = new ScoreGraphics();
+    failedInit = scoreGraphics->Init(mainWindowRenderer, mainWindow->GetScoreZone());
+    if(failedInit){
+        return 1;
+    }
+
+    while (gameContinues){
         Uint32 frameTimeStart = SDL_GetTicks();
 
-        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 0);
+        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
         SDL_RenderClear(mainWindowRenderer);
-        
-        mainSnake->Move();
+
+        gameContinues = mainSnake->Move(playground);
 
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
@@ -42,9 +57,12 @@ int main(void){
             }
         }
         
-        mainSnake->draw(mainWindow, windowSize/100);
+        mainSnake->draw(mainWindow, tile_size);
+        scoreGraphics->draw(score);
+
         SDL_RenderPresent(mainWindowRenderer);
         
+
         Uint32 timeSinceFrameStart = SDL_GetTicks() - frameTimeStart;
         if (timeSinceFrameStart < framerate){
             SDL_Delay(framerate - timeSinceFrameStart);
