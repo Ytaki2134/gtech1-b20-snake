@@ -14,12 +14,7 @@ MainSDLWindow::~MainSDLWindow(void){
 }
 
 int MainSDLWindow::Init(const char* window_name, int width, int height){
-<<<<<<< HEAD
-    if(SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-=======
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
->>>>>>> 4a715834201423c2ab5d5923302f7de2d2f55429
        printf("Erreur d'initialisation de la SDL : %s\n", SDL_GetError());
        return EXIT_FAILURE;
     }
@@ -41,11 +36,7 @@ int MainSDLWindow::Init(const char* window_name, int width, int height){
         return EXIT_FAILURE;
     }
 
-<<<<<<< HEAD
-    this->renderer = SDL_CreateRenderer(this->window, -1 , SDL_RENDERER_PRESENTVSYNC);
-=======
     renderer = SDL_CreateRenderer(window, -1 , SDL_RENDERER_PRESENTVSYNC);
->>>>>>> 4a715834201423c2ab5d5923302f7de2d2f55429
     if(renderer == NULL) {
         printf("Erreur lors de la creation d'un renderer : %s\n",SDL_GetError());
         return EXIT_FAILURE;
