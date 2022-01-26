@@ -23,12 +23,6 @@ int MainSDLWindow::Init(const char* window_name, int width, int height){
         printf("Erreur TTF_Init: %s\n", TTF_GetError());
         return EXIT_FAILURE;
     }
-    
-    TTF_Font* police = TTF_OpenFont("/usr/share/fonts/truetype/lato/Lato-Light.ttf", 30);
-    if(!police){
-        printf("font-init : %s\n", TTF_GetError());
-        // handle error
-    }
 
     window = SDL_CreateWindow(window_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
     if (window == NULL) {

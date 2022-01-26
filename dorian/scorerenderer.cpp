@@ -11,7 +11,7 @@ int ScoreGraphics::Init(SDL_Renderer* renderer, SDL_Rect drawZone){
     this->renderer = renderer;
     this->drawZone = drawZone;
 
-    police = TTF_OpenFont("/usr/share/fonts/truetype/lato/Lato-Light.ttf", 30);
+    police = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30);
     if(!police){
         printf("TTF_OpenFont: %s\n", TTF_GetError());
         return EXIT_FAILURE;
