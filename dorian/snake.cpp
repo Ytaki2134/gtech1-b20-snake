@@ -1,4 +1,6 @@
 #include "snake.hpp"
+#include "MainSDLWindow.hpp"
+#include "playground.hpp"
 
 Segment::Segment(int row, int col, Direction direction, Segment* next){
     this->row = row;
@@ -73,21 +75,32 @@ void Snake::ChangeDirection(Direction newDirection){
     }
 }
 
-void Snake::Move(){
-    Segment* previousHead = head;
-    Direction directionToMove = previousHead->GetDirection();
+bool Snake::Move(Playground* playground){
+    Direction directionToMove = head->GetDirection();
     switch (directionToMove){
         case RIGHT:
-            head = new Segment(previousHead->GetRow(), previousHead->GetCol()+1, directionToMove, previousHead);
+            if(head->GetCol() == playground->GetNbCols()-1){
+                return false;
+            }
+            head = new Segment(head->GetRow(), head->GetCol()+1, directionToMove, head);
             break;
         case LEFT:
-            head = new Segment(previousHead->GetRow(), previousHead->GetCol()-1, directionToMove, previousHead);
+            if(head->GetCol() == 0){
+                return false;
+            }
+            head = new Segment(head->GetRow(), head->GetCol()-1, directionToMove, head);
             break;
         case DOWN:
-            head = new Segment(previousHead->GetRow()+1, previousHead->GetCol(), directionToMove, previousHead);
+            if(head->GetRow() == playground->GetNbRows()-1){
+                return false;
+            }
+            head = new Segment(head->GetRow()+1, head->GetCol(), directionToMove, head);
             break;
         case UP:
-            head = new Segment(previousHead->GetRow()-1, previousHead->GetCol(), directionToMove, previousHead);
+            if(head->GetRow() == 0){
+                return false;
+            }
+            head = new Segment(head->GetRow()-1, head->GetCol(), directionToMove, head);
             break;
     }
 
@@ -102,13 +115,47 @@ void Snake::Move(){
         previousSegment->SetNext(nullptr);
         delete actualSegment;
     }
+
+    return true;
 }
 
-void Snake::draw(SDL_Renderer* mainWindowRenderer, int tile_size){
+bool  Snake::TestCollisions(Playground* playground){
+    int leftLimit = -1;
+    int topLimit = -1;
+    int rightLimit = playground->GetNbCols();
+    int bottomLimit = playground->GetNbRows();
+
+    // Test collision avec les bords du playground //
+    if(head->GetCol() >= rightLimit){
+        return false; // game over //
+    }
+    else if(head->GetCol() <= leftLimit){
+        return false; // game over //
+    }
+
+    if(head->GetRow() >= bottomLimit){
+        return false; // game over //
+    }
+    else if(head->GetRow() <= topLimit){
+        return false; // game over //
+    }
+
+    // Test collisions de la tête avec la queue du serpent //
+
+    // Test collision avec un fruit --> le manger //
+
+    return true; // la partie peut continuer //
+}
+
+
+void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
     Segment* actual_segment = head;
     while(actual_segment != nullptr)
     {
+        SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
+        SDL_Rect playground = mainWindow->GetPlaygroundZone();
         SDL_SetRenderDrawColor(mainWindowRenderer, 255, 255, 255, 255);
+        SDL_RenderSetViewport(mainWindowRenderer, &playground);
         SDL_Rect rectToDraw = {actual_segment->GetCol()*tile_size, actual_segment->GetRow()*tile_size, tile_size, tile_size};
         SDL_RenderDrawRect(mainWindowRenderer, &rectToDraw);
         actual_segment = actual_segment->GetNext();

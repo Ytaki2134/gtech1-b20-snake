@@ -2,10 +2,14 @@
 #define SNAKE_HPP
 
 #include <SDL2/SDL.h>
+#include "MainSDLWindow.hpp"
+
 
 typedef enum{
     DOWN, UP, RIGHT, LEFT
 } Direction;
+
+class Playground;
 
 class Segment{
     public :
@@ -35,11 +39,13 @@ class Snake{
 
         ~Snake();
 
-        void Move();
+        bool Move(Playground* playground);
 
         void ChangeDirection(Direction newDirection);
 
-        void draw(SDL_Renderer* mainWindowRenderer, int tile_size);
+        bool TestCollisions(Playground* playground);
+
+        void draw(MainSDLWindow* mainWindow, int tile_size);
 
     private:
         Segment* head;
