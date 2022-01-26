@@ -2,4 +2,4 @@
 
 The font used in this game is named "Courgette".
 
-Game made by Dorian Gehant and Thomas Jaffé.
+The game was made by Dorian Gehant and Thomas Jaffé.
