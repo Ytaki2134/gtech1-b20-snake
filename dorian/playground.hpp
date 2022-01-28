@@ -1,6 +1,8 @@
 #ifndef PLAYGROUND_HPP
 #define PLAYGROUND_HPP
 
+#include "fruits.hpp"
+
 class Playground{
     public:
         Playground(int nbCols, int nbRows);
@@ -13,7 +15,7 @@ class Playground{
     private:
         int nbCols;
         int nbRows;
-        int nbFruitsPresent;
+        Fruit presentFruit;
 };
 
 #endif

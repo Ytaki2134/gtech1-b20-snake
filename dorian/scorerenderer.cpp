@@ -11,7 +11,7 @@ int ScoreRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone){
     this->renderer = renderer;
     this->drawZone = drawZone;
 
-    police = TTF_OpenFont("../fonts/Courgette/Courgette-Regular.ttf", 30);
+    police = TTF_OpenFont("Courgette-Regular.ttf", 30);
     if(!police){
         printf("TTF_OpenFont: %s\n", TTF_GetError());
         return EXIT_FAILURE;
