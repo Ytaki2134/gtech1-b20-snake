@@ -4,22 +4,24 @@
 #include "scorerenderer.hpp"
 #include "playground.hpp"
 #include "playgroundrenderer.hpp"
+#include "fruits.hpp"
 
-int main(void){
+int main(int argc, char* argv[]){
     Uint32 framerate = 30;
     int windowSize = 800;
     int tile_size = 10; 
     bool gameContinues = true;
-
+    
     MainSDLWindow* mainWindow = new MainSDLWindow();
     bool failedInit = mainWindow->Init("Snake", 800, 800);
     if(failedInit){
         return 1;
     }
-
+    
     SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
     SDL_Event event;
 
+    
     Snake* mainSnake = new Snake(25, 25, RIGHT, 10);
 
     Playground* playground = new Playground(mainWindow->GetPlaygroundZone().w/tile_size, mainWindow->GetPlaygroundZone().h/tile_size);
@@ -43,9 +45,14 @@ int main(void){
         SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
         SDL_RenderClear(mainWindowRenderer);
 
-        playgroundGraphics->draw();
+        playgroundGraphics->drawGrid();
 
         gameContinues = mainSnake->Move(playground);
+        if (playground->GetFruit() == NULL)
+        {
+            playground->SpawnFruit(mainSnake);
+        }
+    
 
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
@@ -66,6 +73,7 @@ int main(void){
             }
         }
         
+        playgroundGraphics->drawFruit(playground->GetFruit());
         mainSnake->draw(mainWindow, tile_size);
         scoreGraphics->draw(score);
 
@@ -77,7 +85,7 @@ int main(void){
             SDL_Delay(framerate - timeSinceFrameStart);
         }
     }
-
-    delete mainWindow;
+    
+    //delete mainWindow;
     return 0;
 }

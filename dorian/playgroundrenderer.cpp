@@ -10,7 +10,7 @@ PlaygroundRenderer::~PlaygroundRenderer(){
 
 }
 
-void PlaygroundRenderer::draw(){
+void PlaygroundRenderer::drawGrid(){
     int x = 0;
     int y = 0;
 
@@ -28,6 +28,21 @@ void PlaygroundRenderer::draw(){
 
         x += tile_size;
     }
+
+    SDL_RenderSetViewport(renderer, NULL);
+}
+
+void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
+
+    //couleurs correspondant dans l'ordre des différents effets dans l'enum FruitEffect
+    SDL_Color effectColors [3] = {{255, 0, 0, 255}, {189, 183, 107, 255}, {255, 255, 0, 255}}; //red, kaki, yellow
+    SDL_RenderSetViewport(renderer, &drawZone);
+
+    //on utilise le fait que les valeurs des effets FruitEffect s'incrémentent à partir de 0 comme les index d'un tableau 
+    SDL_SetRenderDrawColor(renderer, effectColors[fruitToDraw->GetEffect()].r, effectColors[fruitToDraw->GetEffect()].g, effectColors[fruitToDraw->GetEffect()].b, effectColors[fruitToDraw->GetEffect()].a);
+
+    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tile_size, fruitToDraw->GetRow() * tile_size, tile_size, tile_size};
+    SDL_RenderFillRect(renderer, &fruitRect);
 }
 
 int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, int tile_size){

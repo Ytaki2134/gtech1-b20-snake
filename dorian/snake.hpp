@@ -47,6 +47,7 @@ class Snake{
 
         void draw(MainSDLWindow* mainWindow, int tile_size);
 
+        Segment* GetHead();
     private:
         Segment* head;
         Segment* tail;

@@ -2,6 +2,7 @@
 #define PLAYGROUND_HPP
 
 #include "fruits.hpp"
+#include "snake.hpp"
 
 class Playground{
     public:
@@ -10,12 +11,14 @@ class Playground{
 
         int GetNbCols();
         int GetNbRows();
-        void SpawnFruit();
+        Fruit* GetFruit();
+
+        void SpawnFruit(Snake* snake);
 
     private:
         int nbCols;
         int nbRows;
-        Fruit presentFruit;
+        Fruit* presentFruit;
 };
 
 #endif

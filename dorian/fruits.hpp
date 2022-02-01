@@ -4,20 +4,23 @@
 #include <SDL2/SDL.h>
 
 typedef enum{
-    BONUS, MALUS, SPEEDUP
+    BONUS, MALUS, SPEEDUP, COUNT
 } FruitEffect;
 
 class Fruit{
     public:
-        Fruit(int row, int col, SDL_Color color, FruitEffect effect);
+        Fruit(int row, int col, FruitEffect effect);
         ~Fruit();
+
+        int GetCol();
+        int GetRow();
+        FruitEffect GetEffect();
 
         
 
     private:
         int row;
         int col;
-        SDL_Color color;
         FruitEffect effect;
 };
 

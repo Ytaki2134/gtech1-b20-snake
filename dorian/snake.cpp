@@ -165,3 +165,7 @@ void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
         actual_segment = actual_segment->GetNext();
     }
 }
+
+Segment* Snake::GetHead(){
+    return head;
+}
