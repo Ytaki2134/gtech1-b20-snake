@@ -1,9 +1,10 @@
 #include <time.h>
 #include "playground.hpp"
 
-Playground::Playground(int nbCols, int nbRows){
+Playground::Playground(int nbCols, int nbRows, Snake* snake){
     this->nbCols = nbCols;
     this->nbRows = nbRows;
+    this->snake = snake;
     
     presentFruit = NULL;
 }
@@ -24,41 +25,35 @@ Fruit* Playground::GetFruit(){
     return presentFruit;
 }
 
-void Playground::SpawnFruit(Snake* snake){
+Snake* Playground::GetSnake(){
+    return snake;
+}
+
+void Playground::SpawnFruit(){
     srand(time(NULL));
-    int randomCol = rand()%nbCols;
-    int randomRow = rand()%nbRows;
 
-    FruitEffect randomEffect = static_cast<FruitEffect>(rand() % COUNT);
+    FruitEffect randomEffect;
+    //FruitEffect randomEffect = static_cast<FruitEffect>(rand() % COUNT);
 
-    bool correct_position = true;
+    int randomEffectNumber = (rand()%10) + 1;
 
+    //10% de chance d'obtenir un fruit special puisque on peut avoir les chiffres de 1 à 10
+    if(randomEffectNumber == 10){
+        randomEffect = static_cast<FruitEffect>((rand()% COUNT) + 1);
+    }
+    else{
+        randomEffect = BONUS;
+    }
+    
     //vérifier que les coordonnées créées aléatoirement sont correcte (pas sur le serpent) et si ce n'est pas le cas
     //en générer de nouvelles
-    do
+    int randomCol = rand()%nbCols;
+    int randomRow = rand()%nbRows;
+    while(snake->occupiesTile(randomRow, randomCol))
     {
-        correct_position = true;
-        Segment* actualSegment = snake->GetHead();
-
-        //parcourir tout le serpent et comparer les coordonnées de chaque segment avec les coordonnées de la pomme
-        while (actualSegment != NULL)
-        {
-            if (actualSegment->GetCol() == randomCol && actualSegment->GetRow() == randomRow)
-            {
-                correct_position = false;
-                break;
-            }
-            
-            actualSegment = actualSegment->GetNext();
-        }
-
-        //générer nouvelles coords si elles sont incorrectes
-        if(!correct_position){
-            randomCol = rand()%nbCols;
-            randomRow = rand()%nbRows;
-        }
-        
-    } while (!correct_position);
+        randomCol = rand()%nbCols;
+        randomRow = rand()%nbRows;
+    }
     
     //si on est sorti de la boucle while alors les coordonnées sont correctes donc on peut créer la pomme
     presentFruit = new Fruit(randomRow, randomCol, randomEffect);

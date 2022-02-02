@@ -43,9 +43,11 @@ class Snake{
 
         void ChangeDirection(Direction newDirection);
 
-        bool TestCollisions(Playground* playground);
+        //bool TestCollisions(Playground* playground);
 
-        void draw(MainSDLWindow* mainWindow, int tile_size);
+        //void draw(MainSDLWindow* mainWindow, int tile_size);
+
+        bool occupiesTile(int row, int col);
 
         Segment* GetHead();
     private:

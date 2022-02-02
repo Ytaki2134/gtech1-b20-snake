@@ -6,19 +6,21 @@
 
 class Playground{
     public:
-        Playground(int nbCols, int nbRows);
+        Playground(int nbCols, int nbRows, Snake* snake);
         ~Playground();
 
         int GetNbCols();
         int GetNbRows();
         Fruit* GetFruit();
+        Snake* GetSnake();
 
-        void SpawnFruit(Snake* snake);
+        void SpawnFruit();
 
     private:
         int nbCols;
         int nbRows;
         Fruit* presentFruit;
+        Snake* snake;
 };
 
 #endif

@@ -51,4 +51,6 @@ void ScoreRenderer::draw(Score* score){
     SDL_Rect scorePlacement = {numbEatenPlacement.x + drawZone.w/8 + (drawZone.w/35)*nbEatenDigits, drawZone.h/3, 0, 0};
     SDL_QueryTexture(scoreTexture, NULL, NULL, &(scorePlacement.w), &(scorePlacement.h));
     SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePlacement);
+
+    SDL_RenderSetViewport(renderer, NULL);
 }

@@ -123,6 +123,7 @@ bool Snake::Move(Playground* playground){
     return true;
 }
 
+/*
 bool  Snake::TestCollisions(Playground* playground){
     int leftLimit = -1;
     int topLimit = -1;
@@ -151,7 +152,6 @@ bool  Snake::TestCollisions(Playground* playground){
     return true; // la partie peut continuer //
 }
 
-
 void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
     Segment* actual_segment = head;
     while(actual_segment != nullptr)
@@ -166,7 +166,25 @@ void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
         SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
     }
 }
+*/
 
 Segment* Snake::GetHead(){
     return head;
+}
+
+bool Snake::occupiesTile(int row, int col){
+    Segment* actualSegment = head;
+
+    //parcourir tout le serpent et comparer les coordonnées de chaque segment avec les coordonnées données
+    while (actualSegment != NULL)
+    {
+        if (actualSegment->GetCol() == col && actualSegment->GetRow() == row)
+        {
+            return true;
+        }
+        
+        actualSegment = actualSegment->GetNext();
+    }
+
+    return false;
 }
