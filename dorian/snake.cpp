@@ -163,6 +163,7 @@ void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
         SDL_Rect rectToDraw = {actual_segment->GetCol()*tile_size, actual_segment->GetRow()*tile_size, tile_size, tile_size};
         SDL_RenderFillRect(mainWindowRenderer, &rectToDraw);
         actual_segment = actual_segment->GetNext();
+        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
     }
 }
 

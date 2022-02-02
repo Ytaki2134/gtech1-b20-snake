@@ -2,7 +2,7 @@
 #define MainSDLWindow_HPP
 
 #include <SDL2/SDL.h>
-#include "SDL2/SDL_ttf.h"
+#include <SDL2/SDL_ttf.h>
 
 class MainSDLWindow{
     public:

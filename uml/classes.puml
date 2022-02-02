@@ -1,0 +1,164 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Fruit {
+	+Fruit(int row, int col, FruitEffect effect)
+	+~Fruit()
+	-effect : FruitEffect
+	+GetCol() : int
+	+GetEffect() : int
+	+GetRow() : int
+	-col : int
+	-row : int
+}
+
+
+class MainSDLWindow {
+	+MainSDLWindow()
+	+~MainSDLWindow()
+	+GetPlaygroundZone() : SDL_Rect
+	+GetScoreZone() : SDL_Rect
+	-playground : SDL_Rect
+	-scoreZone : SDL_Rect
+	+GetRenderer() : SDL_Renderer*
+	-renderer : SDL_Renderer*
+	-window : SDL_Window*
+	+GetWindowHeight() : int
+	+GetWindowWidth() : int
+	+Init(const char* window_name, int width, int height) : int
+}
+
+
+class Playground {
+	+Playground(int nbCols, int nbRows)
+	+~Playground()
+	+GetFruit() : Fruit*
+	-presentFruit : Fruit*
+	+GetNbCols() : int
+	+GetNbRows() : int
+	-nbCols : int
+	-nbRows : int
+	+SpawnFruit(Snake* snake) : void
+}
+
+
+class PlaygroundRenderer {
+	+PlaygroundRenderer()
+	+~PlaygroundRenderer()
+	-drawZone : SDL_Rect
+	-renderer : SDL_Renderer*
+	+Init(SDL_Renderer* renderer, SDL_Rect drawZone, int tile_size) : int
+	-tile_size : int
+	+drawFruit(Fruit* fruitToDraw) : void
+	+drawGrid() : void
+}
+
+
+class Score {
+	+Score()
+	+~Score()
+	+getNumberEaten() : int
+	+getScore() : int
+	-number_eaten : int
+	-score : int
+	+update_numb_eaten(int value) : void
+	+update_score(int value) : void
+}
+
+
+class ScoreRenderer {
+	+ScoreRenderer()
+	+~ScoreRenderer()
+	-drawZone : SDL_Rect
+	-renderer : SDL_Renderer*
+	-police : TTF_Font*
+	+Init(SDL_Renderer* renderer, SDL_Rect drawZone) : int
+	+draw(Score* score) : void
+}
+
+
+class Segment {
+	+Segment(int row, int col, Direction direction, Segment* next)
+	+~Segment()
+	-direction : Direction
+	+GetNext() : Segment*
+	-next : Segment*
+	+GetCol() : int
+	+GetDirection() : int
+	+GetRow() : int
+	-col : int
+	-row : int
+	+SetDirection(Direction newDirection) : void
+	+SetNext(Segment* nextSegment) : void
+}
+
+
+class Snake {
+	+Snake(int starting_row, int starting_col, Direction starting_direction, int length)
+	+~Snake()
+	+GetHead() : Segment*
+	-head : Segment*
+	-tail : Segment*
+	+Move(Playground* playground) : bool
+	+TestCollisions(Playground* playground) : bool
+	+ChangeDirection(Direction newDirection) : void
+	+draw(MainSDLWindow* mainWindow, int tile_size) : void
+}
+
+
+enum Direction {
+	DOWN
+	LEFT
+	RIGHT
+	UP
+}
+
+
+enum FruitEffect {
+	BONUS
+	COUNT
+	MALUS
+	SPEEDUP
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+
+
+
+/' Aggregation relationships '/
+
+.Fruit *-- .FruitEffect
+
+
+.Playground o-- .Fruit
+
+
+.Segment *-- .Direction
+
+
+.Segment o-- .Segment
+
+
+.Snake "2" o-- .Segment
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
+

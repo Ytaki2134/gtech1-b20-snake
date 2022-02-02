@@ -7,9 +7,9 @@
 #include "fruits.hpp"
 
 int main(int argc, char* argv[]){
-    Uint32 framerate = 30;
+    Uint32 framerate = 50;
     int windowSize = 800;
-    int tile_size = 10; 
+    int tile_size = 20; 
     bool gameContinues = true;
     
     MainSDLWindow* mainWindow = new MainSDLWindow();
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]){
     SDL_Event event;
 
     
-    Snake* mainSnake = new Snake(25, 25, RIGHT, 10);
+    Snake* mainSnake = new Snake(25, 25, RIGHT, 5);
 
     Playground* playground = new Playground(mainWindow->GetPlaygroundZone().w/tile_size, mainWindow->GetPlaygroundZone().h/tile_size);
     PlaygroundRenderer* playgroundGraphics = new PlaygroundRenderer();

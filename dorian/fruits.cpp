@@ -21,3 +21,4 @@ int Fruit::GetRow(){
 FruitEffect Fruit::GetEffect(){
     return effect;
 }
+
