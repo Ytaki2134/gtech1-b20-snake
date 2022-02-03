@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 #include "MainSDLWindow.hpp"
+#include "score.hpp"
+#include "fruits.hpp"
 
 
 typedef enum{
@@ -39,9 +41,11 @@ class Snake{
 
         ~Snake();
 
-        bool Move(Playground* playground);
+        bool Move(Playground* playground, Score* score, int* framerate);
 
         void ChangeDirection(Direction newDirection);
+
+        bool Eat(Fruit* fruitToEat, Score* score, int* framerate);
 
         //bool TestCollisions(Playground* playground);
 
@@ -52,7 +56,6 @@ class Snake{
         Segment* GetHead();
     private:
         Segment* head;
-        Segment* tail;
 
 };
 

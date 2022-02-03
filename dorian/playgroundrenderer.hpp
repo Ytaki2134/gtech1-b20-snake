@@ -10,19 +10,22 @@ class PlaygroundRenderer{
         PlaygroundRenderer();
         ~PlaygroundRenderer();
 
-        void drawGrid();
-        void drawFruit(Fruit* fruitToDraw);
-        void drawSnake(Snake* snakeToDraw);
-        int Init(SDL_Renderer* renderer, SDL_Rect drawZone, int tile_size);
-    
+        int Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground);
+        void draw(Playground* playground);
+
     private:
         int InitBackground();
+        void drawBackground();
+        void drawFruit(Fruit* fruitToDraw);
+        void drawSnake(Snake* snakeToDraw);
 
     private:
         SDL_Rect drawZone;
+        Playground* playground;
         SDL_Renderer* renderer;
-        int tile_size;
         SDL_Texture* bgTexture;
+        int tileWidth;
+        int tileHeight;
 };
 
 

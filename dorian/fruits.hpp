@@ -4,7 +4,7 @@
 #include <SDL2/SDL.h>
 
 typedef enum{
-    BONUS, MALUS, SPEEDUP, COUNT
+    BONUS, SHRINK, SPEEDUP, COUNT
 } FruitEffect;
 
 class Fruit{

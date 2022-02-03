@@ -6,7 +6,7 @@ Playground::Playground(int nbCols, int nbRows, Snake* snake){
     this->nbRows = nbRows;
     this->snake = snake;
     
-    presentFruit = NULL;
+    SpawnFruit();
 }
 
 Playground::~Playground(){
@@ -27,6 +27,10 @@ Fruit* Playground::GetFruit(){
 
 Snake* Playground::GetSnake(){
     return snake;
+}
+
+void Playground::SetFruit(Fruit* newFruit){
+    presentFruit = newFruit;
 }
 
 void Playground::SpawnFruit(){

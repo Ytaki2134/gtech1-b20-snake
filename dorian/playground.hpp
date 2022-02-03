@@ -14,6 +14,8 @@ class Playground{
         Fruit* GetFruit();
         Snake* GetSnake();
 
+        void SetFruit(Fruit* newFruit);
+
         void SpawnFruit();
 
     private:

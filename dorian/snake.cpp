@@ -37,10 +37,12 @@ void Segment::SetDirection(Direction newDirection){
     direction = newDirection;
 }
 
+//crée la liste chaînée qui représente le serpent en partant de sa queue
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
 
     Segment* segment = NULL;
-    for(int i=length-1;i>0;i--){ // on part de la queue du serpent jusqu'au dernier segment avant la tête
+    // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
+    for(int i=length-1;i>0;i--){
         switch (startingDirection){
             case RIGHT:
                 segment = new Segment(startingRow, startingCol-i, startingDirection, segment);
@@ -55,10 +57,6 @@ Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int 
                 segment = new Segment(startingRow+i, startingCol, startingDirection, segment);
                 break;
         }
-
-        if(i==length-1){ // si on est à la première itération, on est donc à la queue
-            tail = segment;
-        }
     }
 
     head = new Segment(startingRow, startingCol, startingDirection, segment);
@@ -68,6 +66,8 @@ Snake::~Snake(){
 
 }
 
+//change la direction du serpent en changeant la direction de sa tête, à part si cette direction amenerait le serpent à
+//se trourner de 180°
 void Snake::ChangeDirection(Direction newDirection){
     Direction current_direction = head->GetDirection();
     if((newDirection == LEFT and current_direction != RIGHT) || (newDirection == RIGHT and current_direction != LEFT)){
@@ -78,80 +78,107 @@ void Snake::ChangeDirection(Direction newDirection){
     }
 }
 
-bool Snake::Move(Playground* playground){
+//fait avancer le serpent dans la direction de la tête et effectue les actions résultantes de ce déplacement
+//(game over à cause de colision, manger fruit)
+bool Snake::Move(Playground* playground, Score* score, int* framerate){
     Direction directionToMove = head->GetDirection();
+
+    //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
+    //on vérifie si ce nouveau segment a une position amenant à une défaite (bords du playground ou segment du serpent)
+    //si c'est le cas on retourne false pour que la partie se termine.
     switch (directionToMove){
         case RIGHT:
-            if(head->GetCol() == playground->GetNbCols()-1){
+            if(head->GetCol() == playground->GetNbCols()-1 || this->occupiesTile(head->GetRow(), head->GetCol()+1)){
                 return false;
             }
             head = new Segment(head->GetRow(), head->GetCol()+1, directionToMove, head);
             break;
         case LEFT:
-            if(head->GetCol() == 0){
+            if(head->GetCol() == 0 || this->occupiesTile(head->GetRow(), head->GetCol()-1)){
                 return false;
             }
             head = new Segment(head->GetRow(), head->GetCol()-1, directionToMove, head);
             break;
         case DOWN:
-            if(head->GetRow() == playground->GetNbRows()-1){
+            if(head->GetRow() == playground->GetNbRows()-1 || this->occupiesTile(head->GetRow()+1, head->GetCol())){
                 return false;
             }
             head = new Segment(head->GetRow()+1, head->GetCol(), directionToMove, head);
             break;
         case UP:
-            if(head->GetRow() == 0){
+            if(head->GetRow() == 0 || this->occupiesTile(head->GetRow()-1, head->GetCol())){
                 return false;
             }
             head = new Segment(head->GetRow()-1, head->GetCol(), directionToMove, head);
             break;
     }
 
-    Segment* actualSegment = head;
-    Segment* previousSegment = nullptr;
-    while (actualSegment->GetNext() != nullptr){
-        previousSegment = actualSegment;
-        actualSegment = actualSegment->GetNext();
+    bool snakeIsGrowing = false;
+    // si la nouvelle tête du serpent est sur un fruit, il le mange 
+    if (head->GetRow() == playground->GetFruit()->GetRow() && head->GetCol() == playground->GetFruit()->GetCol())
+    {
+        snakeIsGrowing = Eat(playground->GetFruit(), score, framerate);
+        playground->SetFruit(NULL);
     }
 
-    if (previousSegment != nullptr){
-        previousSegment->SetNext(nullptr);
-        tail = previousSegment;
-        delete actualSegment;
+    //avec la création de la nouvelle tête, le serpent a grandit de 1. Si on veut seulement se déplacer, il faut alors
+    //supprimer un segment quelque part. Les segments les plus facile à supprimer sont la queue et la tête
+    //or on ne veut pas supprimer la tête donc on supprime la queue.
+    if (!snakeIsGrowing)
+    {
+        Segment* actualSegment = head;
+        Segment* previousSegment = nullptr;
+        while (actualSegment->GetNext() != nullptr){
+            previousSegment = actualSegment;
+            actualSegment = actualSegment->GetNext();
+        }
+
+        if (previousSegment != nullptr){
+            previousSegment->SetNext(nullptr);
+            delete actualSegment;
+        }
     }
 
     return true;
 }
 
-/*
-bool  Snake::TestCollisions(Playground* playground){
-    int leftLimit = -1;
-    int topLimit = -1;
-    int rightLimit = playground->GetNbCols();
-    int bottomLimit = playground->GetNbRows();
+/* mange un fruit, activant son effet et le faisant disparaître */
+bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
+    bool snakeGrows = false;
 
-    // Test collision avec les bords du playground //
-    if(head->GetCol() >= rightLimit){
-        return false; // game over //
+    switch(fruitToEat->GetEffect()){
+        case BONUS:
+            score->update_numb_eaten(1);
+            snakeGrows = true;
+            break;
+            
+        case SHRINK:
+        {
+            Segment* actualSegment = head;
+            Segment* previousSegment = NULL;
+            //parcourir le serpent jusqu'à la queue
+            while (actualSegment->GetNext() != NULL)
+            {
+                previousSegment = actualSegment;
+                actualSegment = actualSegment->GetNext();
+            }
+            previousSegment->SetNext(NULL);
+            delete actualSegment;
+            break;
+        }
+
+        case SPEEDUP:
+            if(*framerate > 20){
+                *framerate -= 5;
+            }
+            break;
     }
-    else if(head->GetCol() <= leftLimit){
-        return false; // game over //
-    }
 
-    if(head->GetRow() >= bottomLimit){
-        return false; // game over //
-    }
-    else if(head->GetRow() <= topLimit){
-        return false; // game over //
-    }
-
-    // Test collisions de la tête avec la queue du serpent //
-
-    // Test collision avec un fruit --> le manger //
-
-    return true; // la partie peut continuer //
+    delete fruitToEat;
+    return snakeGrows;
 }
 
+/*
 void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
     Segment* actual_segment = head;
     while(actual_segment != nullptr)
@@ -172,6 +199,7 @@ Segment* Snake::GetHead(){
     return head;
 }
 
+//parcours le serpent pour savoir si le serpent contient un segment de coordonnées row et col
 bool Snake::occupiesTile(int row, int col){
     Segment* actualSegment = head;
 
