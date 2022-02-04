@@ -1,14 +1,15 @@
 
 #include "playgroundrenderer.hpp"
 #include "playground.hpp"
+#include <cmath>
+#include <algorithm>
 
 PlaygroundRenderer::PlaygroundRenderer(){
     renderer = NULL;
     bgTexture = NULL;
     playground = NULL;
     drawZone = {0, 0, 0, 0};
-    tileWidth = 0;
-    tileHeight = 0;
+    tileSize = 0;
 }
 
 PlaygroundRenderer::~PlaygroundRenderer(){
@@ -34,7 +35,7 @@ void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
     //on utilise le fait que les valeurs des effets FruitEffect s'incrémentent à partir de 0 comme les index d'un tableau 
     SDL_SetRenderDrawColor(renderer, effectColors[fruitToDraw->GetEffect()].r, effectColors[fruitToDraw->GetEffect()].g, effectColors[fruitToDraw->GetEffect()].b, effectColors[fruitToDraw->GetEffect()].a);
 
-    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileWidth, fruitToDraw->GetRow() * tileHeight, tileWidth, tileHeight};
+    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileSize, fruitToDraw->GetRow() * tileSize, tileSize, tileSize};
     SDL_RenderFillRect(renderer, &fruitRect);
 }
 
@@ -45,7 +46,7 @@ void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
 
     while(actual_segment != nullptr)
     {
-        SDL_Rect rectToDraw = {actual_segment->GetCol()*tileWidth, actual_segment->GetRow()*tileHeight, tileWidth, tileHeight};
+        SDL_Rect rectToDraw = {actual_segment->GetCol()*tileSize, actual_segment->GetRow()*tileSize, tileSize, tileSize};
         SDL_RenderFillRect(renderer, &rectToDraw);
         actual_segment = actual_segment->GetNext();
     }
@@ -58,8 +59,15 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
     this->drawZone = drawZone;
     this->playground = playground;
 
-    this->tileWidth = drawZone.w/playground->GetNbCols();
-    this->tileHeight = drawZone.h/playground->GetNbRows();
+    int tileWidth = floor(drawZone.w/playground->GetNbCols());
+    int tileHeight = floor(drawZone.h/playground->GetNbRows());
+    this->tileSize = std::min(tileHeight,tileWidth);
+    
+    this->drawZone.w = tileSize * playground->GetNbCols();
+    this->drawZone.h = tileSize * playground->GetNbRows();
+    this->drawZone.y += (drawZone.h - this->drawZone.h) / 2;
+    this->drawZone.x += (drawZone.w - this->drawZone.w) / 2;
+    
 
     bool initBackgroundFailed = InitBackground();
     if (initBackgroundFailed){
@@ -89,21 +97,22 @@ int PlaygroundRenderer::InitBackground(){
 
 	SDL_SetRenderTarget(renderer, bgTexture);
 
-    int x = 0;
-    int y = 0;
+
+    int row = 0;
+    int col = 0;
 
     SDL_SetRenderDrawColor(renderer, 21, 71, 52, 255);
     
-    while(y < drawZone.h){
-        if(x >= drawZone.w){
-            y += tileHeight;
-            x = 0;
-        }
-
-        SDL_Rect actual_tile = {x, y, tileWidth, tileHeight};
+    while(row < playground->GetNbRows()){
+        SDL_Rect actual_tile = {col*tileSize, row*tileSize, tileSize, tileSize};
         SDL_RenderDrawRect(renderer, &actual_tile);
 
-        x += tileWidth;
+        col ++;
+
+        if(col >= playground->GetNbCols()){
+            row ++;
+            col = 0;
+        }
     }
 	
 	SDL_SetRenderTarget(renderer, NULL);

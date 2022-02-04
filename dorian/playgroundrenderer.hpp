@@ -24,8 +24,7 @@ class PlaygroundRenderer{
         Playground* playground;
         SDL_Renderer* renderer;
         SDL_Texture* bgTexture;
-        int tileWidth;
-        int tileHeight;
+        int tileSize;
 };
 
 

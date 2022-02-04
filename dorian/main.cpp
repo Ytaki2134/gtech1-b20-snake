@@ -8,14 +8,15 @@
 
 int main(int argc, char* argv[]){
     int framerate = 50;
-    int windowSize = 1000;
+    int windowWidth = 1000;
+    int windowHeight = 1000;
     int nbRow = 50;
     int nbCol = 50;
     bool waitingForStart = true;
     bool gameContinues = true;
     
     MainSDLWindow* mainWindow = new MainSDLWindow();
-    bool failedInit = mainWindow->Init("Snake", windowSize, windowSize);
+    bool failedInit = mainWindow->Init("Snake", windowWidth, windowHeight);
     if(failedInit){
         return 1;
     }
@@ -26,7 +27,7 @@ int main(int argc, char* argv[]){
     
     Snake* mainSnake = new Snake(nbRow/2, nbCol/2, RIGHT, 3);
 
-    Playground* playground = new Playground(nbCol, nbRow, mainSnake);
+    Playground* playground = new Playground(nbRow, nbCol, mainSnake);
     PlaygroundRenderer* playgroundGraphics = new PlaygroundRenderer();
     failedInit = playgroundGraphics->Init(mainWindowRenderer, mainWindow->GetPlaygroundZone(), playground);
 
@@ -40,9 +41,20 @@ int main(int argc, char* argv[]){
     if(failedInit){
         return 1;
     }
-
-    SDL_Rect startButton = {windowSize/4, windowSize/3, windowSize/2, windowSize/14};
+    
     TTF_Font* outsideMainLoopFont = TTF_OpenFont("arial.ttf", 64);
+    
+    SDL_Surface* gameStartSurface = TTF_RenderText_Blended(outsideMainLoopFont, "Press to start !", {255, 255, 255, 255});
+    SDL_Texture* gameStartText = SDL_CreateTextureFromSurface(mainWindowRenderer, gameStartSurface);
+    SDL_FreeSurface(gameStartSurface);
+    SDL_Rect gameStartPlacement;
+    SDL_QueryTexture(gameStartText, NULL, NULL, &gameStartPlacement.w, &gameStartPlacement.h);
+    gameStartPlacement.x = (windowWidth-gameStartPlacement.w)/2;
+    gameStartPlacement.y = (windowHeight-gameStartPlacement.h)/2;
+
+    
+    SDL_Rect startButton = {gameStartPlacement.x - 30, gameStartPlacement.y - 20, gameStartPlacement.w + 60, gameStartPlacement.h + 40};
+    
     
     while(waitingForStart)
     {
@@ -67,12 +79,7 @@ int main(int argc, char* argv[]){
         SDL_SetRenderDrawColor(mainWindowRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(mainWindowRenderer, &startButton);
 
-        SDL_Surface* gameOverSurface = TTF_RenderText_Blended(outsideMainLoopFont, "Press to start !", {255, 255, 255, 255});
-        SDL_Texture* gameOverText = SDL_CreateTextureFromSurface(mainWindowRenderer, gameOverSurface);
-        SDL_FreeSurface(gameOverSurface);
-        SDL_Rect gameOverPlacement = {startButton.x + (windowSize/25), startButton.y, 0, 0};
-        SDL_QueryTexture(gameOverText, NULL, NULL, &(gameOverPlacement.w), &(gameOverPlacement.h));
-        SDL_RenderCopy(mainWindowRenderer, gameOverText, NULL, &gameOverPlacement);
+        SDL_RenderCopy(mainWindowRenderer, gameStartText, NULL, &gameStartPlacement);
 
         SDL_RenderPresent(mainWindowRenderer);
     }
@@ -134,8 +141,10 @@ int main(int argc, char* argv[]){
     SDL_Surface* gameOverSurface = TTF_RenderText_Blended(outsideMainLoopFont, "Game Over !", {255, 0, 0, 255});
     SDL_Texture* gameOverText = SDL_CreateTextureFromSurface(mainWindowRenderer, gameOverSurface);
     SDL_FreeSurface(gameOverSurface);
-    SDL_Rect gameOverPlacement = {windowSize/3, windowSize/3, 0, 0};
-    SDL_QueryTexture(gameOverText, NULL, NULL, &(gameOverPlacement.w), &(gameOverPlacement.h));
+    SDL_Rect gameOverPlacement;
+    SDL_QueryTexture(gameStartText, NULL, NULL, &gameOverPlacement.w, &gameOverPlacement.h);
+    gameOverPlacement.x = (windowWidth-gameOverPlacement.w)/2;
+    gameOverPlacement.y = (windowHeight-gameOverPlacement.h)/2;
     SDL_RenderCopy(mainWindowRenderer, gameOverText, NULL, &gameOverPlacement);
 
     SDL_RenderPresent(mainWindowRenderer);

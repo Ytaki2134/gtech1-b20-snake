@@ -1,7 +1,7 @@
 #include <time.h>
 #include "playground.hpp"
 
-Playground::Playground(int nbCols, int nbRows, Snake* snake){
+Playground::Playground(int nbRows, int nbCols, Snake* snake){
     this->nbCols = nbCols;
     this->nbRows = nbRows;
     this->snake = snake;
