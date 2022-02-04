@@ -35,27 +35,36 @@ class MainSDLWindow {
 
 
 class Playground {
-	+Playground(int nbCols, int nbRows)
+	+Playground(int nbCols, int nbRows, Snake* snake)
 	+~Playground()
 	+GetFruit() : Fruit*
 	-presentFruit : Fruit*
+	+GetSnake() : Snake*
+	-snake : Snake*
 	+GetNbCols() : int
 	+GetNbRows() : int
 	-nbCols : int
 	-nbRows : int
-	+SpawnFruit(Snake* snake) : void
+	+SetFruit(Fruit* newFruit) : void
+	+SpawnFruit() : void
 }
 
 
 class PlaygroundRenderer {
 	+PlaygroundRenderer()
 	+~PlaygroundRenderer()
+	-playground : Playground*
 	-drawZone : SDL_Rect
 	-renderer : SDL_Renderer*
-	+Init(SDL_Renderer* renderer, SDL_Rect drawZone, int tile_size) : int
-	-tile_size : int
-	+drawFruit(Fruit* fruitToDraw) : void
-	+drawGrid() : void
+	-bgTexture : SDL_Texture*
+	+Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground) : int
+	-InitBackground() : int
+	-tileHeight : int
+	-tileWidth : int
+	+draw(Playground* playground) : void
+	-drawBackground() : void
+	-drawFruit(Fruit* fruitToDraw) : void
+	-drawSnake(Snake* snakeToDraw) : void
 }
 
 
@@ -103,11 +112,10 @@ class Snake {
 	+~Snake()
 	+GetHead() : Segment*
 	-head : Segment*
-	-tail : Segment*
-	+Move(Playground* playground) : bool
-	+TestCollisions(Playground* playground) : bool
+	+Eat(Fruit* fruitToEat, Score* score, int* framerate) : bool
+	+Move(Playground* playground, Score* score, int* framerate) : bool
+	+occupiesTile(int row, int col) : bool
 	+ChangeDirection(Direction newDirection) : void
-	+draw(MainSDLWindow* mainWindow, int tile_size) : void
 }
 
 
@@ -122,7 +130,7 @@ enum Direction {
 enum FruitEffect {
 	BONUS
 	COUNT
-	MALUS
+	SHRINK
 	SPEEDUP
 }
 
@@ -143,13 +151,19 @@ enum FruitEffect {
 .Playground o-- .Fruit
 
 
+.Playground o-- .Snake
+
+
+.PlaygroundRenderer o-- .Playground
+
+
 .Segment *-- .Direction
 
 
 .Segment o-- .Segment
 
 
-.Snake "2" o-- .Segment
+.Snake o-- .Segment
 
 
 

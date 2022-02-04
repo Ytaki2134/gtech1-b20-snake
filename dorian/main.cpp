@@ -67,12 +67,12 @@ int main(int argc, char* argv[]){
         SDL_SetRenderDrawColor(mainWindowRenderer, 255, 0, 0, 255);
         SDL_RenderFillRect(mainWindowRenderer, &startButton);
 
-        SDL_Surface* gameOverSurface = TTF_RenderText_Blended(outsideMainLoopFont, "Press to start !", {255, 255, 255, 255});
-        SDL_Texture* gameOverText = SDL_CreateTextureFromSurface(mainWindowRenderer, gameOverSurface);
-        SDL_FreeSurface(gameOverSurface);
-        SDL_Rect gameOverPlacement = {startButton.x + (windowSize/25), startButton.y, 0, 0};
-        SDL_QueryTexture(gameOverText, NULL, NULL, &(gameOverPlacement.w), &(gameOverPlacement.h));
-        SDL_RenderCopy(mainWindowRenderer, gameOverText, NULL, &gameOverPlacement);
+        SDL_Surface* gameStartSurface = TTF_RenderText_Blended(outsideMainLoopFont, "Press to start !", {255, 255, 255, 255});
+        SDL_Texture* gameStartText = SDL_CreateTextureFromSurface(mainWindowRenderer, gameStartSurface);
+        SDL_FreeSurface(gameStartSurface);
+        SDL_Rect gameStartPlacement = {startButton.x + (windowSize/25), startButton.y, 0, 0};
+        SDL_QueryTexture(gameStartText, NULL, NULL, &(gameStartPlacement.w), &(gameStartPlacement.h));
+        SDL_RenderCopy(mainWindowRenderer, gameStartText, NULL, &gameStartPlacement);
 
         SDL_RenderPresent(mainWindowRenderer);
     }
@@ -80,7 +80,7 @@ int main(int argc, char* argv[]){
 
     while (gameContinues){
         bool uniqueInputUsed = false;
-        Uint32 frameTimeStart = SDL_GetTicks();
+        int frameTimeStart = SDL_GetTicks();
 
         SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
         SDL_RenderClear(mainWindowRenderer);
@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
         
         // si la frame est allée plus vite que le framerate, on attend jusqu'à arriver à framerate, faisant en sorte que
         // chacune de nos frame ait la même durée
-        Uint32 timeSinceFrameStart = SDL_GetTicks() - frameTimeStart;
+        int timeSinceFrameStart = SDL_GetTicks() - frameTimeStart;
         if (timeSinceFrameStart < framerate){
             SDL_Delay(framerate - timeSinceFrameStart);
         }
