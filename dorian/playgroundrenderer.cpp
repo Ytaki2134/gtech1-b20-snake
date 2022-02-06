@@ -40,18 +40,34 @@ void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
 }
 
 void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
-    Segment* actual_segment = snakeToDraw->GetHead();
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderSetViewport(renderer, &drawZone);
+    Segment* actual_segment = snakeToDraw->GetHead();
 
-    while(actual_segment != nullptr)
-    {
-        SDL_Rect rectToDraw = {actual_segment->GetCol()*tileSize, actual_segment->GetRow()*tileSize, tileSize, tileSize};
-        SDL_RenderFillRect(renderer, &rectToDraw);
+    drawSnakeHead(actual_segment);
+    actual_segment = actual_segment->GetNext();
+    while(actual_segment->GetNext() != NULL){
+        drawSnakeBodySegment(actual_segment);
         actual_segment = actual_segment->GetNext();
     }
+    drawSnakeTail(actual_segment);
     
     SDL_RenderSetViewport(renderer, NULL);
+}
+
+void PlaygroundRenderer::drawSnakeHead(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderFillRect(renderer, &rectToDraw);
+}
+
+void PlaygroundRenderer::drawSnakeBodySegment(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderFillRect(renderer, &rectToDraw);
+}
+
+void PlaygroundRenderer::drawSnakeTail(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderFillRect(renderer, &rectToDraw);
 }
 
 int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground){

@@ -8,7 +8,7 @@
 
 
 typedef enum{
-    DOWN, UP, RIGHT, LEFT
+    DOWN, UP, RIGHT, LEFT, DOWNRIGHT, DOWNLEFT, UPRIGHT, UPLEFT, RIGHTDOWN, RIGHTUP, LEFTDOWN, LEFTUP
 } Direction;
 
 class Playground;
@@ -54,6 +54,7 @@ class Snake{
         bool occupiesTile(int row, int col);
 
         Segment* GetHead();
+
     private:
         Segment* head;
         int length;

@@ -2,6 +2,77 @@
 #include "MainSDLWindow.hpp"
 #include "playground.hpp"
 
+bool isCombinedDirection(Direction direction){
+    return direction != RIGHT && direction != LEFT && direction != UP && direction != DOWN;
+}
+
+bool onSameAxis(Direction firstDirection, Direction secondDirection){
+    return (firstDirection == RIGHT && secondDirection == LEFT) 
+           || (firstDirection == LEFT && secondDirection == RIGHT)
+           || (firstDirection == UP && secondDirection == DOWN)
+           || (firstDirection == DOWN && firstDirection == UP);
+}
+
+//combine deux directions pour créer une direction qui dont le sens est firstDirection -> secondDirection
+Direction CombinedDirection(Direction firstDirection, Direction secondDirection){
+    if(firstDirection == secondDirection){
+        return firstDirection;
+    }
+
+    switch(firstDirection){
+        case RIGHT:
+            switch(secondDirection){
+                case UP:
+                    return RIGHTUP;
+                
+                case DOWN:
+                    return RIGHTDOWN;
+            }
+            break;
+        
+        case LEFT:
+            switch(secondDirection){
+                case UP:
+                    return LEFTUP;
+                
+                case DOWN:
+                    return LEFTDOWN;
+            }
+            break;
+        
+        case UP:
+            switch(secondDirection){
+                case RIGHT:
+                    return UPRIGHT;
+                
+                case LEFT:
+                    return UPLEFT;
+            }
+            break;
+        
+        case DOWN:
+            switch(secondDirection){
+                case RIGHT:
+                    return DOWNRIGHT;
+                
+                case LEFT:
+                    return DOWNLEFT;
+            }
+            break;
+    }
+
+    //gestion des erreurs
+    if(onSameAxis(firstDirection, secondDirection)){
+        printf("Erreur combinaison de direction : les deux directions sont opposées");
+    }
+
+    if(isCombinedDirection(firstDirection) || isCombinedDirection(secondDirection)){
+        printf("Erreur combinaison de direction : une des deux direction est déjà une combinaison");
+    }
+
+    return firstDirection;
+}
+
 Segment::Segment(int row, int col, Direction direction, Segment* next){
     this->row = row;
     this->col = col;
@@ -72,10 +143,7 @@ Snake::~Snake(){
 //se trourner de 180°
 void Snake::ChangeDirection(Direction newDirection){
     Direction current_direction = head->GetDirection();
-    if((newDirection == LEFT and current_direction != RIGHT) || (newDirection == RIGHT and current_direction != LEFT)){
-        head->SetDirection(newDirection);
-    }
-    else if((newDirection == UP and current_direction != DOWN) || (newDirection == DOWN and current_direction != UP)){
+    if(!onSameAxis(newDirection, current_direction)){
         head->SetDirection(newDirection);
     }
 }
@@ -83,6 +151,7 @@ void Snake::ChangeDirection(Direction newDirection){
 //fait avancer le serpent dans la direction de la tête et effectue les actions résultantes de ce déplacement
 //(game over à cause de colision, manger fruit)
 bool Snake::Move(Playground* playground, Score* score, int* framerate){
+    Segment* previousHead = head;
     Direction directionToMove = head->GetDirection();
 
     //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
@@ -114,6 +183,8 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
             head = new Segment(head->GetRow()-1, head->GetCol(), directionToMove, head);
             break;
     }
+
+    previousHead->SetDirection(CombinedDirection(previousHead->GetDirection(), head->GetDirection()));
 
     bool snakeIsGrowing = false;
     // si la nouvelle tête du serpent est sur un fruit, il le mange 

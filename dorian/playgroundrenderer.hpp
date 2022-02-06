@@ -18,6 +18,9 @@ class PlaygroundRenderer{
         void drawBackground();
         void drawFruit(Fruit* fruitToDraw);
         void drawSnake(Snake* snakeToDraw);
+        void drawSnakeHead(Segment* segment);
+        void drawSnakeBodySegment(Segment* segment);
+        void drawSnakeTail(Segment* segment);
 
     private:
         SDL_Rect drawZone;
