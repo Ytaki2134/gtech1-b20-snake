@@ -56,6 +56,7 @@ class Snake{
         Segment* GetHead();
     private:
         Segment* head;
+        int length;
 
 };
 

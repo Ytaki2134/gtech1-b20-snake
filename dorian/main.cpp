@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "MainSDLWindow.hpp"
 #include "snake.hpp"
 #include "score.hpp"
@@ -25,7 +27,7 @@ int main(int argc, char* argv[]){
     SDL_Event event;
 
     
-    Snake* mainSnake = new Snake(nbRow/2, nbCol/2, RIGHT, 3);
+    Snake* mainSnake = new Snake(nbRow/2, nbCol/2, RIGHT, std::min(nbRow, nbCol)/6);
 
     Playground* playground = new Playground(nbRow, nbCol, mainSnake);
     PlaygroundRenderer* playgroundGraphics = new PlaygroundRenderer();
@@ -91,7 +93,7 @@ int main(int argc, char* argv[]){
 
         SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
         SDL_RenderClear(mainWindowRenderer);
-
+        
         gameContinues = mainSnake->Move(playground, score, &framerate);
         if (playground->GetFruit() == NULL)
         {

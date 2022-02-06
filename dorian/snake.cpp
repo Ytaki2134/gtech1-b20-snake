@@ -39,6 +39,8 @@ void Segment::SetDirection(Direction newDirection){
 
 //crée la liste chaînée qui représente le serpent en partant de sa queue
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
+    this->length = length;
+
 
     Segment* segment = NULL;
     // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
@@ -138,6 +140,7 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
             delete actualSegment;
         }
     }
+    score->update_score(pow(static_cast<double>(length), 2)/(playground->GetNbCols() * playground->GetNbRows()));
 
     return true;
 }
@@ -150,6 +153,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
         case BONUS:
             score->update_numb_eaten(1);
             snakeGrows = true;
+            length ++;
             break;
             
         case SHRINK:
@@ -164,6 +168,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
             }
             previousSegment->SetNext(NULL);
             delete actualSegment;
+            length --;
             break;
         }
 

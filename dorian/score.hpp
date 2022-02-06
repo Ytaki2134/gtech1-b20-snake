@@ -7,14 +7,14 @@ class Score{
         ~Score();
         
         void update_numb_eaten(int value);
-        void update_score(int value);
+        void update_score(double value);
 
         int getScore();
         int getNumberEaten();
     
     private:
         int number_eaten;
-        int score;
+        double score;
 };
 
 #endif
