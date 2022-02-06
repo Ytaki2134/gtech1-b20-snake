@@ -58,6 +58,7 @@ class Snake{
     private:
         Segment* head;
         int length;
+        Direction directionToMove;
 
 };
 

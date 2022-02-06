@@ -12,8 +12,8 @@ int main(int argc, char* argv[]){
     int framerate = 50;
     int windowWidth = 1000;
     int windowHeight = 1000;
-    int nbRow = 50;
-    int nbCol = 50;
+    int nbRow = 30;
+    int nbCol = 30;
     bool waitingForStart = true;
     bool gameContinues = true;
     
@@ -90,17 +90,7 @@ int main(int argc, char* argv[]){
     while (gameContinues){
         bool uniqueInputUsed = false;
         Uint32 frameTimeStart = SDL_GetTicks();
-
-        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
-        SDL_RenderClear(mainWindowRenderer);
         
-        gameContinues = mainSnake->Move(playground, score, &framerate);
-        if (playground->GetFruit() == NULL)
-        {
-            playground->SpawnFruit();
-        }
-    
-
         while (SDL_PollEvent(&event)){
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
                 return 0;
@@ -122,6 +112,15 @@ int main(int argc, char* argv[]){
                     uniqueInputUsed = true;
                 }
             }
+        }
+
+        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
+        SDL_RenderClear(mainWindowRenderer);
+
+        gameContinues = mainSnake->Move(playground, score, &framerate);
+        if (playground->GetFruit() == NULL)
+        {
+            playground->SpawnFruit();
         }
         
         playgroundGraphics->draw(playground);

@@ -40,7 +40,6 @@ void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
 }
 
 void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderSetViewport(renderer, &drawZone);
     Segment* actual_segment = snakeToDraw->GetHead();
 
@@ -57,17 +56,17 @@ void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
 
 void PlaygroundRenderer::drawSnakeHead(Segment* segment){
     SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
-    SDL_RenderFillRect(renderer, &rectToDraw);
+    SDL_RenderCopy(renderer, snakeHeadTextures[segment->GetDirection()], NULL, &rectToDraw);
 }
 
 void PlaygroundRenderer::drawSnakeBodySegment(Segment* segment){
     SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
-    SDL_RenderFillRect(renderer, &rectToDraw);
+    SDL_RenderCopy(renderer, snakeBodyTextures[segment->GetDirection()], NULL, &rectToDraw);
 }
 
 void PlaygroundRenderer::drawSnakeTail(Segment* segment){
     SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
-    SDL_RenderFillRect(renderer, &rectToDraw);
+    SDL_RenderCopy(renderer, snakeTailTextures[segment->GetDirection()], NULL, &rectToDraw);
 }
 
 int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground){
@@ -90,19 +89,28 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
         return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+    bool initSnakeTexturesFailed = InitSnakeTextures();
+    if (initSnakeTexturesFailed){
+        return EXIT_FAILURE;
+    }
 
+    return EXIT_SUCCESS;
+}
+
+SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
+    SDL_Surface* imageSurf = SDL_LoadBMP(filename->c_str());
+    if(imageSurf == NULL){
+        printf("Problem with loading image: %s\n", SDL_GetError());
+    }
+	SDL_Texture* imageTexture = SDL_CreateTextureFromSurface(renderer, imageSurf);
+    if(imageTexture == NULL){
+        printf("Problem with creating texture: %s\n", SDL_GetError());
+    }
+	SDL_FreeSurface(imageSurf);
+    return imageTexture;
 }
 
 int PlaygroundRenderer::InitBackground(){
-/*	SDL_Surface* bmpSurf = SDL_LoadBMP("test.bmp");
-	bgTexture = SDL_CreateTextureFromSurface(renderer, bmpSurf);
-    if(bgTexture == NULL){
-        printf("Problem with creating texture : %s\n", SDL_GetError());
-        return EXIT_FAILURE;
-    }
-	SDL_FreeSurface(bmpSurf);
-    return EXIT_SUCCESS;*/
     bgTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, drawZone.w, drawZone.h);
     
@@ -132,5 +140,48 @@ int PlaygroundRenderer::InitBackground(){
     }
 	
 	SDL_SetRenderTarget(renderer, NULL);
+    return EXIT_SUCCESS;
+}
+
+int PlaygroundRenderer::InitSnakeTextures(){
+    //listes des noms  des images pour créer les textures du serpent
+    const std::string headTextureNames[] = {"head_down.bmp", "head_up.bmp", "head_right.bmp", "head_left.bmp"};
+    const std::string bodyTextureNames[] = {"body_down.bmp", "body_up.bmp", "body_right.bmp", "body_left.bmp",
+                                            "body_downright.bmp", "body_downleft.bmp", "body_upright.bmp", "body_upleft.bmp",
+                                            "body_rightdown.bmp", "body_rightup.bmp", "body_leftdown.bmp", "body_leftup.bmp"};
+    const std::string tailTextureNames[] = {"tail_down.bmp", "tail_up.bmp", "tail_right.bmp", "tail_left.bmp",
+                                            "tail_downright.bmp", "tail_downleft.bmp", "tail_upright.bmp", "tail_upleft.bmp",
+                                            "tail_rightdown.bmp", "tail_rightup.bmp", "tail_leftdown.bmp", "tail_leftup.bmp"};
+    
+
+    //à chacun des éléments des tableaux de textures du PlaygroundRenderer, on associe une texture créée à 
+    //partir d'un des noms d'images des tableaux au dessus
+    for(int i=0; i<sizeof(headTextureNames) / sizeof(headTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + headTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeHeadTextures[i] = loadedTexture;
+    }
+
+    for(int i=0; i<sizeof(bodyTextureNames) / sizeof(bodyTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + bodyTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeBodyTextures[i] = loadedTexture;
+    }
+
+    for(int i=0; i<sizeof(tailTextureNames) / sizeof(tailTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + tailTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeTailTextures[i] = loadedTexture;
+    }
+
     return EXIT_SUCCESS;
 }

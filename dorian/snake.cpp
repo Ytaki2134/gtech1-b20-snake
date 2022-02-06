@@ -111,7 +111,7 @@ void Segment::SetDirection(Direction newDirection){
 //crée la liste chaînée qui représente le serpent en partant de sa queue
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
     this->length = length;
-
+    this->directionToMove = startingDirection;
 
     Segment* segment = NULL;
     // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
@@ -142,9 +142,8 @@ Snake::~Snake(){
 //change la direction du serpent en changeant la direction de sa tête, à part si cette direction amenerait le serpent à
 //se trourner de 180°
 void Snake::ChangeDirection(Direction newDirection){
-    Direction current_direction = head->GetDirection();
-    if(!onSameAxis(newDirection, current_direction)){
-        head->SetDirection(newDirection);
+    if(!onSameAxis(newDirection, directionToMove)){
+        directionToMove = newDirection;
     }
 }
 
@@ -152,7 +151,6 @@ void Snake::ChangeDirection(Direction newDirection){
 //(game over à cause de colision, manger fruit)
 bool Snake::Move(Playground* playground, Score* score, int* framerate){
     Segment* previousHead = head;
-    Direction directionToMove = head->GetDirection();
 
     //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
     //on vérifie si ce nouveau segment a une position amenant à une défaite (bords du playground ou segment du serpent)

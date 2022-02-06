@@ -1,7 +1,9 @@
 #ifndef PLAYGROUNDRENDERER_HPP
 #define PLAYGROUNDRENDERER_HPP
 
+#include <string>
 #include <SDL2/SDL.h>
+
 #include "fruits.hpp"
 #include "snake.hpp"
 
@@ -15,6 +17,10 @@ class PlaygroundRenderer{
 
     private:
         int InitBackground();
+        int InitSnakeTextures();
+
+        SDL_Texture* LoadTexture(const std::string* filename);
+
         void drawBackground();
         void drawFruit(Fruit* fruitToDraw);
         void drawSnake(Snake* snakeToDraw);
@@ -27,6 +33,9 @@ class PlaygroundRenderer{
         Playground* playground;
         SDL_Renderer* renderer;
         SDL_Texture* bgTexture;
+        SDL_Texture* snakeHeadTextures[4];
+        SDL_Texture* snakeBodyTextures[12];
+        SDL_Texture* snakeTailTextures[12];
         int tileSize;
 };
 
