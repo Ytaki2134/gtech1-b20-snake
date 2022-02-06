@@ -43,7 +43,7 @@ void Playground::SpawnFruit(){
 
     //10% de chance d'obtenir un fruit special puisque on peut avoir les chiffres de 1 à 10
     if(randomEffectNumber == 10){
-        randomEffect = static_cast<FruitEffect>((rand()% COUNT) + 1);
+        randomEffect = static_cast<FruitEffect>((rand()% (COUNT-1)) + 1);
     }
     else{
         randomEffect = BONUS;
