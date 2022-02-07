@@ -1,0 +1,10 @@
+@startuml
+class MainSDLWindow{
+  -SDL_Renderer* renderer
+  -SDL_Window* window
+  +MainSDLWindow()
+  +~MainSDLWindow()
+  +SDL_Renderer* : GenRenderer()
+  +int : Init(const char* window_name, int width, int height)
+}
+@enduml
