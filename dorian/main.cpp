@@ -28,7 +28,7 @@ int main(int argc, char* argv[]){
 
     
     Snake* mainSnake = new Snake(nbRow/2, nbCol/2, RIGHT, std::min(nbRow, nbCol)/6);
-
+    
     Playground* playground = new Playground(nbRow, nbCol, mainSnake);
     PlaygroundRenderer* playgroundGraphics = new PlaygroundRenderer();
     failedInit = playgroundGraphics->Init(mainWindowRenderer, mainWindow->GetPlaygroundZone(), playground);

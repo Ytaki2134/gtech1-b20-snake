@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "snake.hpp"
 #include "MainSDLWindow.hpp"
 #include "playground.hpp"
@@ -113,12 +115,12 @@ void Segment::SetDirection(Direction newDirection){
 
 //crée la liste chaînée qui représente le serpent en partant de sa queue
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
-    this->length = length;
+    this->length = std::max(2, length);
     this->directionToMove = startingDirection;
 
     Segment* segment = NULL;
     // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
-    for(int i=length-1;i>0;i--){
+    for(int i=this->length-1;i>0;i--){
         switch (startingDirection){
             case RIGHT:
                 segment = new Segment(startingRow, startingCol-i, startingDirection, segment);
@@ -236,6 +238,9 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
         //fait retrécir le serpent de 1
         case SHRINK:
         {
+            if(length == 2){
+               break; 
+            }
             Segment* actualSegment = head;
             Segment* previousSegment = NULL;
             //parcourir le serpent jusqu'à la queue
