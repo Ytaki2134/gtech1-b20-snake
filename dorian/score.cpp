@@ -16,7 +16,7 @@ void Score::update_numb_eaten(int value){
     }
 }
 
-void Score::update_score(int value){
+void Score::update_score(double value){
     score += value;
 }
 

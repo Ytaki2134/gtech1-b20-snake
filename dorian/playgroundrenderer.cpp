@@ -1,14 +1,15 @@
 
 #include "playgroundrenderer.hpp"
 #include "playground.hpp"
+#include <cmath>
+#include <algorithm>
 
 PlaygroundRenderer::PlaygroundRenderer(){
     renderer = NULL;
     bgTexture = NULL;
     playground = NULL;
     drawZone = {0, 0, 0, 0};
-    tileWidth = 0;
-    tileHeight = 0;
+    tileSize = 0;
 }
 
 PlaygroundRenderer::~PlaygroundRenderer(){
@@ -34,23 +35,38 @@ void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
     //on utilise le fait que les valeurs des effets FruitEffect s'incrémentent à partir de 0 comme les index d'un tableau 
     SDL_SetRenderDrawColor(renderer, effectColors[fruitToDraw->GetEffect()].r, effectColors[fruitToDraw->GetEffect()].g, effectColors[fruitToDraw->GetEffect()].b, effectColors[fruitToDraw->GetEffect()].a);
 
-    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileWidth, fruitToDraw->GetRow() * tileHeight, tileWidth, tileHeight};
+    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileSize, fruitToDraw->GetRow() * tileSize, tileSize, tileSize};
     SDL_RenderFillRect(renderer, &fruitRect);
 }
 
 void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
-    Segment* actual_segment = snakeToDraw->GetHead();
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderSetViewport(renderer, &drawZone);
+    Segment* actual_segment = snakeToDraw->GetHead();
 
-    while(actual_segment != nullptr)
-    {
-        SDL_Rect rectToDraw = {actual_segment->GetCol()*tileWidth, actual_segment->GetRow()*tileHeight, tileWidth, tileHeight};
-        SDL_RenderFillRect(renderer, &rectToDraw);
+    drawSnakeHead(actual_segment);
+    actual_segment = actual_segment->GetNext();
+    while(actual_segment->GetNext() != NULL){
+        drawSnakeBodySegment(actual_segment);
         actual_segment = actual_segment->GetNext();
     }
+    drawSnakeTail(actual_segment);
     
     SDL_RenderSetViewport(renderer, NULL);
+}
+
+void PlaygroundRenderer::drawSnakeHead(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderCopy(renderer, snakeHeadTextures[segment->GetDirection()], NULL, &rectToDraw);
+}
+
+void PlaygroundRenderer::drawSnakeBodySegment(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderCopy(renderer, snakeBodyTextures[segment->GetDirection()], NULL, &rectToDraw);
+}
+
+void PlaygroundRenderer::drawSnakeTail(Segment* segment){
+    SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
+    SDL_RenderCopy(renderer, snakeTailTextures[segment->GetDirection()], NULL, &rectToDraw);
 }
 
 int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground){
@@ -58,27 +74,43 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
     this->drawZone = drawZone;
     this->playground = playground;
 
-    this->tileWidth = drawZone.w/playground->GetNbCols();
-    this->tileHeight = drawZone.h/playground->GetNbRows();
+    int tileWidth = floor(drawZone.w/playground->GetNbCols());
+    int tileHeight = floor(drawZone.h/playground->GetNbRows());
+    this->tileSize = std::min(tileHeight,tileWidth);
+    
+    this->drawZone.w = tileSize * playground->GetNbCols();
+    this->drawZone.h = tileSize * playground->GetNbRows();
+    this->drawZone.y += (drawZone.h - this->drawZone.h) / 2;
+    this->drawZone.x += (drawZone.w - this->drawZone.w) / 2;
+    
 
     bool initBackgroundFailed = InitBackground();
     if (initBackgroundFailed){
         return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+    bool initSnakeTexturesFailed = InitSnakeTextures();
+    if (initSnakeTexturesFailed){
+        return EXIT_FAILURE;
+    }
 
+    return EXIT_SUCCESS;
+}
+
+SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
+    SDL_Surface* imageSurf = SDL_LoadBMP(filename->c_str());
+    if(imageSurf == NULL){
+        printf("Problem with loading image: %s\n", SDL_GetError());
+    }
+	SDL_Texture* imageTexture = SDL_CreateTextureFromSurface(renderer, imageSurf);
+    if(imageTexture == NULL){
+        printf("Problem with creating texture: %s\n", SDL_GetError());
+    }
+	SDL_FreeSurface(imageSurf);
+    return imageTexture;
 }
 
 int PlaygroundRenderer::InitBackground(){
-/*	SDL_Surface* bmpSurf = SDL_LoadBMP("test.bmp");
-	bgTexture = SDL_CreateTextureFromSurface(renderer, bmpSurf);
-    if(bgTexture == NULL){
-        printf("Problem with creating texture : %s\n", SDL_GetError());
-        return EXIT_FAILURE;
-    }
-	SDL_FreeSurface(bmpSurf);
-    return EXIT_SUCCESS;*/
     bgTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, drawZone.w, drawZone.h);
     
@@ -89,23 +121,67 @@ int PlaygroundRenderer::InitBackground(){
 
 	SDL_SetRenderTarget(renderer, bgTexture);
 
-    int x = 0;
-    int y = 0;
+
+    int row = 0;
+    int col = 0;
 
     SDL_SetRenderDrawColor(renderer, 21, 71, 52, 255);
     
-    while(y < drawZone.h){
-        if(x >= drawZone.w){
-            y += tileHeight;
-            x = 0;
-        }
-
-        SDL_Rect actual_tile = {x, y, tileWidth, tileHeight};
+    while(row < playground->GetNbRows()){
+        SDL_Rect actual_tile = {col*tileSize, row*tileSize, tileSize, tileSize};
         SDL_RenderDrawRect(renderer, &actual_tile);
 
-        x += tileWidth;
+        col ++;
+
+        if(col >= playground->GetNbCols()){
+            row ++;
+            col = 0;
+        }
     }
 	
 	SDL_SetRenderTarget(renderer, NULL);
+    return EXIT_SUCCESS;
+}
+
+int PlaygroundRenderer::InitSnakeTextures(){
+    //listes des noms  des images pour créer les textures du serpent
+    const std::string headTextureNames[] = {"head_down.bmp", "head_up.bmp", "head_right.bmp", "head_left.bmp"};
+    const std::string bodyTextureNames[] = {"body_down.bmp", "body_up.bmp", "body_right.bmp", "body_left.bmp",
+                                            "body_downright.bmp", "body_downleft.bmp", "body_upright.bmp", "body_upleft.bmp",
+                                            "body_rightdown.bmp", "body_rightup.bmp", "body_leftdown.bmp", "body_leftup.bmp"};
+    const std::string tailTextureNames[] = {"tail_down.bmp", "tail_up.bmp", "tail_right.bmp", "tail_left.bmp",
+                                            "tail_downright.bmp", "tail_downleft.bmp", "tail_upright.bmp", "tail_upleft.bmp",
+                                            "tail_rightdown.bmp", "tail_rightup.bmp", "tail_leftdown.bmp", "tail_leftup.bmp"};
+    
+
+    //à chacun des éléments des tableaux de textures du PlaygroundRenderer, on associe une texture créée à 
+    //partir d'un des noms d'images des tableaux au dessus
+    for(int i=0; i<sizeof(headTextureNames) / sizeof(headTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + headTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeHeadTextures[i] = loadedTexture;
+    }
+
+    for(int i=0; i<sizeof(bodyTextureNames) / sizeof(bodyTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + bodyTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeBodyTextures[i] = loadedTexture;
+    }
+
+    for(int i=0; i<sizeof(tailTextureNames) / sizeof(tailTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + tailTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        snakeTailTextures[i] = loadedTexture;
+    }
+
     return EXIT_SUCCESS;
 }
