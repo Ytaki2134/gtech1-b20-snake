@@ -12,7 +12,7 @@ bool onSameAxis(Direction firstDirection, Direction secondDirection){
     return (firstDirection == RIGHT && secondDirection == LEFT) 
            || (firstDirection == LEFT && secondDirection == RIGHT)
            || (firstDirection == UP && secondDirection == DOWN)
-           || (firstDirection == DOWN && firstDirection == UP);
+           || (firstDirection == DOWN && secondDirection == UP);
 }
 
 //combine deux directions pour créer une direction dont le sens est firstDirection -> secondDirection
