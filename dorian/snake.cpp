@@ -2,10 +2,12 @@
 #include "MainSDLWindow.hpp"
 #include "playground.hpp"
 
+//retourne un bool qui est true si la direction donnée est une direction combinée (exemple UPLEFT) et false dans le cas contraire
 bool isCombinedDirection(Direction direction){
     return direction != RIGHT && direction != LEFT && direction != UP && direction != DOWN;
 }
 
+//retourne un bool qui représente le fait que les deux directions soient sur le même axe (donc qu'elles sont opposées) ou non
 bool onSameAxis(Direction firstDirection, Direction secondDirection){
     return (firstDirection == RIGHT && secondDirection == LEFT) 
            || (firstDirection == LEFT && secondDirection == RIGHT)
@@ -13,7 +15,8 @@ bool onSameAxis(Direction firstDirection, Direction secondDirection){
            || (firstDirection == DOWN && firstDirection == UP);
 }
 
-//combine deux directions pour créer une direction qui dont le sens est firstDirection -> secondDirection
+//combine deux directions pour créer une direction dont le sens est firstDirection -> secondDirection
+//cette direction combinée sert à représenter les angles du snake lors du dessin
 Direction CombinedDirection(Direction firstDirection, Direction secondDirection){
     if(firstDirection == secondDirection){
         return firstDirection;
@@ -182,6 +185,9 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
             break;
     }
 
+    //on fait une "combinaison" de la direction de la nouvelle tête et de la nouvelle tête et on donne cette combinaison comme direction de l'ancienne tête
+    //cette combinaison de direction sert lors du graphisme à représenter les angles
+    //si jamais la direction n'a pas changé la combinaison ne change rien
     previousHead->SetDirection(CombinedDirection(previousHead->GetDirection(), head->GetDirection()));
 
     bool snakeIsGrowing = false;
@@ -218,13 +224,16 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
 bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
     bool snakeGrows = false;
 
+
     switch(fruitToEat->GetEffect()){
+        //agrandis le serpent de 1 et rajoute 1 au score des fruits mangés
         case BONUS:
             score->update_numb_eaten(1);
             snakeGrows = true;
             length ++;
             break;
             
+        //fait retrécir le serpent de 1
         case SHRINK:
         {
             Segment* actualSegment = head;
@@ -241,6 +250,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
             break;
         }
 
+        //augmente la vitesse du serpent
         case SPEEDUP:
             if(*framerate > 20){
                 *framerate -= 5;

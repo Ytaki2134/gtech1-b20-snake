@@ -33,12 +33,11 @@ void Playground::SetFruit(Fruit* newFruit){
     presentFruit = newFruit;
 }
 
+//crée un nouveau fruit avec des attributs aléatoire
 void Playground::SpawnFruit(){
     srand(time(NULL));
 
     FruitEffect randomEffect;
-    //FruitEffect randomEffect = static_cast<FruitEffect>(rand() % COUNT);
-
     int randomEffectNumber = (rand()%10) + 1;
 
     //10% de chance d'obtenir un fruit special puisque on peut avoir les chiffres de 1 à 10

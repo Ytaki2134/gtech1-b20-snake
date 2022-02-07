@@ -13,6 +13,7 @@ MainSDLWindow::~MainSDLWindow(void){
     SDL_Quit();
 }
 
+//initialise tous les attributs de la MainSDLWindow
 int MainSDLWindow::Init(const char* window_name, int width, int height){
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
        printf("Erreur d'initialisation de la SDL : %s\n", SDL_GetError());

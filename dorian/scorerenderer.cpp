@@ -21,14 +21,15 @@ int ScoreRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone){
 }
 
 ScoreRenderer::~ScoreRenderer(){
-
 }
 
+//dessine toute la partie score de l'écran 
 void ScoreRenderer::draw(Score* score){
     SDL_RenderSetViewport(renderer, &drawZone);
     SDL_SetRenderDrawColor(renderer, 65, 105, 225, 255);
     SDL_RenderFillRect(renderer, &drawZone);
 
+    //dessine le nombre de fruit mangé ainsi que une petite image du fruit bonus sur le coté gauche de ce nombre
     std::string numberEatenString = std::to_string(score->getNumberEaten());
     const char* numberEaten = numberEatenString.c_str();
     SDL_Surface* numbEatenSurface = TTF_RenderText_Blended(police, numberEaten, {255, 255, 255, 255});
@@ -42,6 +43,7 @@ void ScoreRenderer::draw(Score* score){
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_RenderFillRect(renderer, &numbEatenPlacement);
 
+    //dessine le score
     std::string scoreString = std::to_string(score->getScore());
     const char* scoreChar = scoreString.c_str();
     SDL_Surface* scoreSurface = TTF_RenderText_Blended(police, scoreChar, {255, 255, 255, 255});
@@ -52,5 +54,7 @@ void ScoreRenderer::draw(Score* score){
     SDL_QueryTexture(scoreTexture, NULL, NULL, &(scorePlacement.w), &(scorePlacement.h));
     SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePlacement);
 
+    SDL_DestroyTexture(numbEatenTexture);
+    SDL_DestroyTexture(scoreTexture);
     SDL_RenderSetViewport(renderer, NULL);
 }

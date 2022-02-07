@@ -14,14 +14,28 @@ PlaygroundRenderer::PlaygroundRenderer(){
 
 PlaygroundRenderer::~PlaygroundRenderer(){
     
+    //detruire toutes les textures des différents tableaux de textures du serpent
+    for(int i=0; i<sizeof(snakeHeadTextures) / sizeof(snakeHeadTextures[0]);i++){
+        SDL_DestroyTexture(snakeHeadTextures[i]);
+    }
+
+    for(int i=0; i<sizeof(snakeTailTextures) / sizeof(snakeTailTextures[0]);i++){
+        SDL_DestroyTexture(snakeTailTextures[i]);
+    }
+
+    for(int i=0; i<sizeof(snakeBodyTextures) / sizeof(snakeBodyTextures[0]);i++){
+        SDL_DestroyTexture(snakeBodyTextures[i]);
+    }
 }
 
+//dessine le cadrillage, le fruit et le snake.
 void PlaygroundRenderer::draw(Playground* playground){
     drawBackground();
     drawFruit(playground->GetFruit());
     drawSnake(playground->GetSnake());
 }
 
+//dessine le cadrillage
 void PlaygroundRenderer::drawBackground(){
     SDL_RenderCopy(renderer, bgTexture, NULL, &drawZone);
 }
@@ -69,15 +83,18 @@ void PlaygroundRenderer::drawSnakeTail(Segment* segment){
     SDL_RenderCopy(renderer, snakeTailTextures[segment->GetDirection()], NULL, &rectToDraw);
 }
 
+//initialise toutes les valeurs requises au fonctionnement du PlaygroundRenderer
 int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground){
     this->renderer = renderer;
     this->drawZone = drawZone;
     this->playground = playground;
 
+    //calcule la tileSize en fonction du nombre de col/rows et de la width/height de la drawzone du playground
     int tileWidth = floor(drawZone.w/playground->GetNbCols());
     int tileHeight = floor(drawZone.h/playground->GetNbRows());
     this->tileSize = std::min(tileHeight,tileWidth);
     
+    //change la drawzone pour qu'elle soit de la bonne taille et la place au milieu de l'écran
     this->drawZone.w = tileSize * playground->GetNbCols();
     this->drawZone.h = tileSize * playground->GetNbRows();
     this->drawZone.y += (drawZone.h - this->drawZone.h) / 2;
@@ -97,6 +114,7 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
     return EXIT_SUCCESS;
 }
 
+//load une image à partir d'un nom de fichier et renvoie la texture créée à partir de cette dernière
 SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
     SDL_Surface* imageSurf = SDL_LoadBMP(filename->c_str());
     if(imageSurf == NULL){
@@ -110,6 +128,7 @@ SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
     return imageTexture;
 }
 
+//dessine le cadrillage sur une texture et enregistre cette derrière dans l'attribut bgTexture
 int PlaygroundRenderer::InitBackground(){
     bgTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, drawZone.w, drawZone.h);
@@ -143,6 +162,7 @@ int PlaygroundRenderer::InitBackground(){
     return EXIT_SUCCESS;
 }
 
+//initialise les attributs snakeHeadTextures, snakeHeadTextures et snakeTailTextures qui sont utilisés pour dessiner le serpent
 int PlaygroundRenderer::InitSnakeTextures(){
     //listes des noms  des images pour créer les textures du serpent
     const std::string headTextureNames[] = {"head_down.bmp", "head_up.bmp", "head_right.bmp", "head_left.bmp"};

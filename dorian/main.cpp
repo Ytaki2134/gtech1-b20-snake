@@ -10,8 +10,8 @@
 
 int main(int argc, char* argv[]){
     int framerate = 50;
-    int windowWidth = 1000;
-    int windowHeight = 1000;
+    int windowWidth = 800;
+    int windowHeight = 800;
     int nbRow = 30;
     int nbCol = 30;
     bool waitingForStart = true;

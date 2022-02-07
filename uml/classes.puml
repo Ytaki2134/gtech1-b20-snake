@@ -56,27 +56,34 @@ class PlaygroundRenderer {
 	-playground : Playground*
 	-drawZone : SDL_Rect
 	-renderer : SDL_Renderer*
+	-LoadTexture(const std::string* filename) : SDL_Texture*
 	-bgTexture : SDL_Texture*
+	-snakeBodyTextures : SDL_Texture*
+	-snakeHeadTextures : SDL_Texture*
+	-snakeTailTextures : SDL_Texture*
 	+Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground) : int
 	-InitBackground() : int
-	-tileHeight : int
-	-tileWidth : int
+	-InitSnakeTextures() : int
+	-tileSize : int
 	+draw(Playground* playground) : void
 	-drawBackground() : void
 	-drawFruit(Fruit* fruitToDraw) : void
 	-drawSnake(Snake* snakeToDraw) : void
+	-drawSnakeBodySegment(Segment* segment) : void
+	-drawSnakeHead(Segment* segment) : void
+	-drawSnakeTail(Segment* segment) : void
 }
 
 
 class Score {
 	+Score()
 	+~Score()
+	-score : double
 	+getNumberEaten() : int
 	+getScore() : int
 	-number_eaten : int
-	-score : int
 	+update_numb_eaten(int value) : void
-	+update_score(int value) : void
+	+update_score(double value) : void
 }
 
 
@@ -110,20 +117,30 @@ class Segment {
 class Snake {
 	+Snake(int starting_row, int starting_col, Direction starting_direction, int length)
 	+~Snake()
+	-directionToMove : Direction
 	+GetHead() : Segment*
 	-head : Segment*
 	+Eat(Fruit* fruitToEat, Score* score, int* framerate) : bool
 	+Move(Playground* playground, Score* score, int* framerate) : bool
 	+occupiesTile(int row, int col) : bool
+	-length : int
 	+ChangeDirection(Direction newDirection) : void
 }
 
 
 enum Direction {
 	DOWN
+	DOWNLEFT
+	DOWNRIGHT
 	LEFT
+	LEFTDOWN
+	LEFTUP
 	RIGHT
+	RIGHTDOWN
+	RIGHTUP
 	UP
+	UPLEFT
+	UPRIGHT
 }
 
 
@@ -161,6 +178,9 @@ enum FruitEffect {
 
 
 .Segment o-- .Segment
+
+
+.Snake *-- .Direction
 
 
 .Snake o-- .Segment
