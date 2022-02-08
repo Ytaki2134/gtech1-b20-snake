@@ -1,8 +1,11 @@
 
-#include "playgroundrenderer.hpp"
-#include "playground.hpp"
 #include <cmath>
 #include <algorithm>
+#include <time.h>
+
+#include "playgroundrenderer.hpp"
+#include "playground.hpp"
+
 
 PlaygroundRenderer::PlaygroundRenderer(){
     renderer = NULL;
@@ -26,6 +29,16 @@ PlaygroundRenderer::~PlaygroundRenderer(){
     for(int i=0; i<sizeof(snakeBodyTextures) / sizeof(snakeBodyTextures[0]);i++){
         SDL_DestroyTexture(snakeBodyTextures[i]);
     }
+
+    //detruire les textures des fruits
+    for(int i=0; i<sizeof(fruitsTextures) / sizeof(fruitsTextures[0]);i++){
+        SDL_DestroyTexture(fruitsTextures[i]);
+    }
+
+    //detruire les textures des tiles
+    for(int i=0; i<sizeof(tilesTextures) / sizeof(tilesTextures[0]);i++){
+        SDL_DestroyTexture(tilesTextures[i]);
+    }
 }
 
 //dessine le cadrillage, le fruit et le snake.
@@ -41,16 +54,11 @@ void PlaygroundRenderer::drawBackground(){
 }
 
 void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
-
-    //couleurs correspondant dans l'ordre des différents effets dans l'enum FruitEffect
-    SDL_Color effectColors [3] = {{255, 0, 0, 255}, {189, 183, 107, 255}, {255, 255, 0, 255}}; //red, kaki, yellow
     SDL_RenderSetViewport(renderer, &drawZone);
+    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileSize, fruitToDraw->GetRow() * tileSize, tileSize, tileSize};
 
     //on utilise le fait que les valeurs des effets FruitEffect s'incrémentent à partir de 0 comme les index d'un tableau 
-    SDL_SetRenderDrawColor(renderer, effectColors[fruitToDraw->GetEffect()].r, effectColors[fruitToDraw->GetEffect()].g, effectColors[fruitToDraw->GetEffect()].b, effectColors[fruitToDraw->GetEffect()].a);
-
-    SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileSize, fruitToDraw->GetRow() * tileSize, tileSize, tileSize};
-    SDL_RenderFillRect(renderer, &fruitRect);
+    SDL_RenderCopy(renderer, fruitsTextures[fruitToDraw->GetEffect()], NULL, &fruitRect);
 }
 
 void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
@@ -99,15 +107,24 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
     this->drawZone.h = tileSize * playground->GetNbRows();
     this->drawZone.y += (drawZone.h - this->drawZone.h) / 2;
     this->drawZone.x += (drawZone.w - this->drawZone.w) / 2;
-    
-
-    bool initBackgroundFailed = InitBackground();
-    if (initBackgroundFailed){
-        return EXIT_FAILURE;
-    }
 
     bool initSnakeTexturesFailed = InitSnakeTextures();
     if (initSnakeTexturesFailed){
+        return EXIT_FAILURE;
+    }
+
+    bool initFruitsTexturesFailed = InitFruitsTextures();
+    if(initFruitsTexturesFailed){
+        return EXIT_FAILURE;
+    }
+
+    bool initTilesTexturesFailed = InitTilesTextures();
+    if(initTilesTexturesFailed){
+        return EXIT_FAILURE;
+    }
+
+    bool initBackgroundFailed = InitBackground();
+    if (initBackgroundFailed){
         return EXIT_FAILURE;
     }
 
@@ -128,8 +145,11 @@ SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
     return imageTexture;
 }
 
-//dessine le cadrillage sur une texture et enregistre cette derrière dans l'attribut bgTexture
+//dessine le cadrillage sur une texture et enregistre cette dernière dans l'attribut bgTexture
 int PlaygroundRenderer::InitBackground(){
+    srand(time(NULL));
+    SDL_Texture* randomTileTexture;
+
     bgTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
 		SDL_TEXTUREACCESS_TARGET, drawZone.w, drawZone.h);
     
@@ -144,10 +164,17 @@ int PlaygroundRenderer::InitBackground(){
     int row = 0;
     int col = 0;
 
-    SDL_SetRenderDrawColor(renderer, 21, 71, 52, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     
     while(row < playground->GetNbRows()){
         SDL_Rect actual_tile = {col*tileSize, row*tileSize, tileSize, tileSize};
+        //on prend une texture au hasard dans le tableau tilesTextures du playgroundRenderer
+
+        //on prend un nombre au hasard entre 0 et la taille de tilesTexture-1 et on obtient la texture qui est à cet index
+        int random_index = rand()%(sizeof(tilesTextures) / sizeof(tilesTextures[0]));
+        randomTileTexture = tilesTextures[random_index];
+        
+        SDL_RenderCopy(renderer, randomTileTexture, NULL, &actual_tile);
         SDL_RenderDrawRect(renderer, &actual_tile);
 
         col ++;
@@ -201,6 +228,37 @@ int PlaygroundRenderer::InitSnakeTextures(){
             return EXIT_FAILURE;
         }
         snakeTailTextures[i] = loadedTexture;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+//initialise l'attribut fruitsTextures du playgroundRenderer
+int PlaygroundRenderer::InitFruitsTextures(){
+    //textures correspondant dans l'ordre des différents effets dans l'enum FruitEffect
+    const std::string effectsImagesName [4] = {"images/bonus.bmp", "images/poison.bmp", "images/speedup.bmp", "images/inverse.bmp"}; 
+
+    for(int i=0; i<sizeof(effectsImagesName) / sizeof(effectsImagesName[0]);i++){
+        SDL_Texture* loadedTexture = LoadTexture(&effectsImagesName[i]);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        fruitsTextures[i] = LoadTexture(&effectsImagesName[i]);
+    }
+
+    return EXIT_SUCCESS;
+}
+
+//initialise l'attribut tilesTextures du playgroundRenderer
+int PlaygroundRenderer::InitTilesTextures(){
+    const std::string tilesTexturesName[2] = {"images/tile1.bmp", "images/tile2.bmp"};
+
+    for(int i=0; i<sizeof(tilesTexturesName) / sizeof(tilesTexturesName[0]);i++){
+        SDL_Texture* loadedTexture = LoadTexture(&tilesTexturesName[i]);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        tilesTextures[i] = LoadTexture(&tilesTexturesName[i]);
     }
 
     return EXIT_SUCCESS;

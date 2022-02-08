@@ -154,7 +154,7 @@ void Snake::ChangeDirection(Direction newDirection){
 
 //fait avancer le serpent dans la direction de la tête et effectue les actions résultantes de ce déplacement
 //(game over à cause de colision, manger fruit)
-bool Snake::Move(Playground* playground, Score* score, int* framerate){
+bool Snake::Move(Playground* playground, Score* score, int* framerate, bool* playersControlsInversed){
     Segment* previousHead = head;
 
     //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
@@ -196,7 +196,7 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
     // si la nouvelle tête du serpent est sur un fruit, il le mange 
     if (head->GetRow() == playground->GetFruit()->GetRow() && head->GetCol() == playground->GetFruit()->GetCol())
     {
-        snakeIsGrowing = Eat(playground->GetFruit(), score, framerate);
+        snakeIsGrowing = Eat(playground->GetFruit(), score, framerate, playersControlsInversed);
         playground->SetFruit(NULL);
     }
 
@@ -223,7 +223,7 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
 }
 
 /* mange un fruit, activant son effet et le faisant disparaître */
-bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
+bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerControlsInversed){
     bool snakeGrows = false;
 
 
@@ -260,6 +260,10 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
             if(*framerate > 20){
                 *framerate -= 5;
             }
+            break;
+        
+        case INVERSE:
+            *playerControlsInversed = true;
             break;
     }
 

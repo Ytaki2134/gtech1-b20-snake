@@ -18,6 +18,8 @@ class PlaygroundRenderer{
     private:
         int InitBackground();
         int InitSnakeTextures();
+        int InitFruitsTextures();
+        int InitTilesTextures();
 
         SDL_Texture* LoadTexture(const std::string* filename);
 
@@ -36,6 +38,8 @@ class PlaygroundRenderer{
         SDL_Texture* snakeHeadTextures[4];
         SDL_Texture* snakeBodyTextures[12];
         SDL_Texture* snakeTailTextures[12];
+        SDL_Texture* fruitsTextures[4];
+        SDL_Texture* tilesTextures[2];
         int tileSize;
 };
 

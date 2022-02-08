@@ -41,11 +41,11 @@ class Snake{
 
         ~Snake();
 
-        bool Move(Playground* playground, Score* score, int* framerate);
+        bool Move(Playground* playground, Score* score, int* framerate, bool* playerControlsInversed);
 
         void ChangeDirection(Direction newDirection);
 
-        bool Eat(Fruit* fruitToEat, Score* score, int* framerate);
+        bool Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerControlsInversed);
 
         //bool TestCollisions(Playground* playground);
 

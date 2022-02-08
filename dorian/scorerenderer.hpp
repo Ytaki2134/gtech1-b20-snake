@@ -16,8 +16,12 @@ class ScoreRenderer{
         int Init(SDL_Renderer* renderer, SDL_Rect drawZone);
 
     private:
+        int InitIconsTextures();
+
+    private:
         SDL_Rect drawZone;
         SDL_Renderer* renderer;
+        SDL_Texture* iconsTextures[2];
         TTF_Font* police;
 };
 
