@@ -22,6 +22,10 @@ PlaygroundRenderer::~PlaygroundRenderer(){
         SDL_DestroyTexture(snakeHeadTextures[i]);
     }
 
+    for(int i=0; i<sizeof(crazySnakeHeadTextures) / sizeof(crazySnakeHeadTextures[0]);i++){
+        SDL_DestroyTexture(crazySnakeHeadTextures[i]);
+    }
+
     for(int i=0; i<sizeof(snakeTailTextures) / sizeof(snakeTailTextures[0]);i++){
         SDL_DestroyTexture(snakeTailTextures[i]);
     }
@@ -65,7 +69,7 @@ void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
     SDL_RenderSetViewport(renderer, &drawZone);
     Segment* actual_segment = snakeToDraw->GetHead();
 
-    drawSnakeHead(actual_segment);
+    drawSnakeHead(actual_segment, snakeToDraw->IsCrazy());
     actual_segment = actual_segment->GetNext();
     while(actual_segment->GetNext() != NULL){
         drawSnakeBodySegment(actual_segment);
@@ -76,9 +80,14 @@ void PlaygroundRenderer::drawSnake(Snake* snakeToDraw){
     SDL_RenderSetViewport(renderer, NULL);
 }
 
-void PlaygroundRenderer::drawSnakeHead(Segment* segment){
+void PlaygroundRenderer::drawSnakeHead(Segment* segment, bool snakeIsCrazy){
     SDL_Rect rectToDraw = {segment->GetCol()*tileSize, segment->GetRow()*tileSize, tileSize, tileSize};
-    SDL_RenderCopy(renderer, snakeHeadTextures[segment->GetDirection()], NULL, &rectToDraw);
+    if(snakeIsCrazy){
+        SDL_RenderCopy(renderer, crazySnakeHeadTextures[segment->GetDirection()], NULL, &rectToDraw);
+    }
+    else{
+        SDL_RenderCopy(renderer, snakeHeadTextures[segment->GetDirection()], NULL, &rectToDraw);
+    }
 }
 
 void PlaygroundRenderer::drawSnakeBodySegment(Segment* segment){
@@ -193,6 +202,8 @@ int PlaygroundRenderer::InitBackground(){
 int PlaygroundRenderer::InitSnakeTextures(){
     //listes des noms  des images pour créer les textures du serpent
     const std::string headTextureNames[] = {"head_down.bmp", "head_up.bmp", "head_right.bmp", "head_left.bmp"};
+    const std::string crazyHeadTextureNames[] = {"crazyhead_down.bmp", "crazyhead_up.bmp", "crazyhead_right.bmp", "crazyhead_left.bmp"};
+
     const std::string bodyTextureNames[] = {"body_down.bmp", "body_up.bmp", "body_right.bmp", "body_left.bmp",
                                             "body_downright.bmp", "body_downleft.bmp", "body_upright.bmp", "body_upleft.bmp",
                                             "body_rightdown.bmp", "body_rightup.bmp", "body_leftdown.bmp", "body_leftup.bmp"};
@@ -210,6 +221,15 @@ int PlaygroundRenderer::InitSnakeTextures(){
             return EXIT_FAILURE;
         }
         snakeHeadTextures[i] = loadedTexture;
+    }
+
+    for(int i=0; i<sizeof(crazyHeadTextureNames) / sizeof(crazyHeadTextureNames[0]);i++){
+        std::string fullPath = std::string("images/") + crazyHeadTextureNames[i];
+        SDL_Texture* loadedTexture = LoadTexture(&fullPath);
+        if(loadedTexture == NULL){
+            return EXIT_FAILURE;
+        }
+        crazySnakeHeadTextures[i] = loadedTexture;
     }
 
     for(int i=0; i<sizeof(bodyTextureNames) / sizeof(bodyTextureNames[0]);i++){

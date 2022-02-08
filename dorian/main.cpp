@@ -56,8 +56,7 @@ int main(int argc, char* argv[]){
             return 1;
         }
 
-        bool playerControlsInversed = false;
-        int timeSinceInversedControls = 0;
+        int timeSinceCrazy = 0;
         
         TTF_Font* outsideMainLoopFont = TTF_OpenFont("fonts/arial.ttf", 64);
         TTF_Font* outsideMainLoopSmallFont = TTF_OpenFont("fonts/arial.ttf", 32);
@@ -113,21 +112,13 @@ int main(int argc, char* argv[]){
         while (gameContinues){
             bool uniqueInputUsed = false;
             Uint32 frameTimeStart = SDL_GetTicks();
-
-            if(playerControlsInversed){
-                timeSinceInversedControls ++;
-                if(timeSinceInversedControls == 50){
-                    playerControlsInversed = false;
-                    timeSinceInversedControls = 0;
-                }
-            }
             
             while (SDL_PollEvent(&event)){
                 if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE)
                     return 0;
                 if (event.type == SDL_KEYDOWN){
                     if (event.key.keysym.scancode == SDL_SCANCODE_DOWN && !uniqueInputUsed){
-                        if(playerControlsInversed){
+                        if(mainSnake->IsCrazy()){
                             mainSnake->ChangeDirection(UP);
                             uniqueInputUsed = true;
                         }
@@ -137,7 +128,7 @@ int main(int argc, char* argv[]){
                         }
                     }
                     else if (event.key.keysym.scancode == SDL_SCANCODE_UP && !uniqueInputUsed){
-                        if(playerControlsInversed){
+                        if(mainSnake->IsCrazy()){
                             mainSnake->ChangeDirection(DOWN);
                             uniqueInputUsed = true;
                         } 
@@ -147,7 +138,7 @@ int main(int argc, char* argv[]){
                         } 
                     }
                     else if (event.key.keysym.scancode == SDL_SCANCODE_RIGHT && !uniqueInputUsed){
-                        if(playerControlsInversed){
+                        if(mainSnake->IsCrazy()){
                             mainSnake->ChangeDirection(LEFT);
                             uniqueInputUsed = true;
                         }
@@ -157,7 +148,7 @@ int main(int argc, char* argv[]){
                         }
                     }
                     else if (event.key.keysym.scancode == SDL_SCANCODE_LEFT && !uniqueInputUsed){
-                        if(playerControlsInversed){
+                        if(mainSnake->IsCrazy()){
                             mainSnake->ChangeDirection(RIGHT);
                             uniqueInputUsed = true;
                         }
@@ -169,10 +160,18 @@ int main(int argc, char* argv[]){
                 }
             }
 
+            if(mainSnake->IsCrazy()){
+                timeSinceCrazy ++;
+                if(timeSinceCrazy == 20){
+                    mainSnake->SetCrazy(false);
+                    timeSinceCrazy = 0;
+                }
+            }
+
             SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
             SDL_RenderClear(mainWindowRenderer);
 
-            gameContinues = mainSnake->Move(playground, score, &framerate, &playerControlsInversed);
+            gameContinues = mainSnake->Move(playground, score, &framerate);
             if (playground->GetFruit() == NULL)
             {
                 playground->SpawnFruit();

@@ -41,17 +41,16 @@ class Snake{
 
         ~Snake();
 
-        bool Move(Playground* playground, Score* score, int* framerate, bool* playerControlsInversed);
+        bool Move(Playground* playground, Score* score, int* framerate);
 
         void ChangeDirection(Direction newDirection);
 
-        bool Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerControlsInversed);
-
-        //bool TestCollisions(Playground* playground);
-
-        //void draw(MainSDLWindow* mainWindow, int tile_size);
+        bool Eat(Fruit* fruitToEat, Score* score, int* framerate);
 
         bool occupiesTile(int row, int col);
+
+        void SetCrazy(bool crazy);
+        bool IsCrazy();
 
         Segment* GetHead();
 
@@ -59,6 +58,7 @@ class Snake{
         Segment* head;
         int length;
         Direction directionToMove;
+        bool crazy;
 
 };
 

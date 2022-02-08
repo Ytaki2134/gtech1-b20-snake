@@ -26,7 +26,7 @@ class PlaygroundRenderer{
         void drawBackground();
         void drawFruit(Fruit* fruitToDraw);
         void drawSnake(Snake* snakeToDraw);
-        void drawSnakeHead(Segment* segment);
+        void drawSnakeHead(Segment* segment, bool snakeIsCrazy);
         void drawSnakeBodySegment(Segment* segment);
         void drawSnakeTail(Segment* segment);
 
@@ -36,6 +36,7 @@ class PlaygroundRenderer{
         SDL_Renderer* renderer;
         SDL_Texture* bgTexture;
         SDL_Texture* snakeHeadTextures[4];
+        SDL_Texture* crazySnakeHeadTextures[4];
         SDL_Texture* snakeBodyTextures[12];
         SDL_Texture* snakeTailTextures[12];
         SDL_Texture* fruitsTextures[4];

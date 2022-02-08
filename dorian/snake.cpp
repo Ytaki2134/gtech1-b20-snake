@@ -117,6 +117,7 @@ void Segment::SetDirection(Direction newDirection){
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
     this->length = std::max(2, length);
     this->directionToMove = startingDirection;
+    this->crazy = false;
 
     Segment* segment = NULL;
     // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
@@ -154,7 +155,7 @@ void Snake::ChangeDirection(Direction newDirection){
 
 //fait avancer le serpent dans la direction de la tête et effectue les actions résultantes de ce déplacement
 //(game over à cause de colision, manger fruit)
-bool Snake::Move(Playground* playground, Score* score, int* framerate, bool* playersControlsInversed){
+bool Snake::Move(Playground* playground, Score* score, int* framerate){
     Segment* previousHead = head;
 
     //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
@@ -196,7 +197,7 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate, bool* pla
     // si la nouvelle tête du serpent est sur un fruit, il le mange 
     if (head->GetRow() == playground->GetFruit()->GetRow() && head->GetCol() == playground->GetFruit()->GetCol())
     {
-        snakeIsGrowing = Eat(playground->GetFruit(), score, framerate, playersControlsInversed);
+        snakeIsGrowing = Eat(playground->GetFruit(), score, framerate);
         playground->SetFruit(NULL);
     }
 
@@ -223,7 +224,7 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate, bool* pla
 }
 
 /* mange un fruit, activant son effet et le faisant disparaître */
-bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerControlsInversed){
+bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
     bool snakeGrows = false;
 
 
@@ -263,7 +264,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerCon
             break;
         
         case INVERSE:
-            *playerControlsInversed = true;
+            crazy = true;
             break;
     }
 
@@ -271,22 +272,6 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate, bool* playerCon
     return snakeGrows;
 }
 
-/*
-void Snake::draw(MainSDLWindow* mainWindow, int tile_size){
-    Segment* actual_segment = head;
-    while(actual_segment != nullptr)
-    {
-        SDL_Renderer* mainWindowRenderer = mainWindow->GetRenderer();
-        SDL_Rect playground = mainWindow->GetPlaygroundZone();
-        SDL_SetRenderDrawColor(mainWindowRenderer, 255, 255, 255, 255);
-        SDL_RenderSetViewport(mainWindowRenderer, &playground);
-        SDL_Rect rectToDraw = {actual_segment->GetCol()*tile_size, actual_segment->GetRow()*tile_size, tile_size, tile_size};
-        SDL_RenderFillRect(mainWindowRenderer, &rectToDraw);
-        actual_segment = actual_segment->GetNext();
-        SDL_SetRenderDrawColor(mainWindowRenderer, 0, 0, 0, 255);
-    }
-}
-*/
 
 Segment* Snake::GetHead(){
     return head;
@@ -308,4 +293,13 @@ bool Snake::occupiesTile(int row, int col){
     }
 
     return false;
+}
+
+void Snake::SetCrazy(bool crazy){
+    this->crazy = crazy;
+}
+        
+
+bool Snake::IsCrazy(){
+    return crazy;
 }
