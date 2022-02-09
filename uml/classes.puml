@@ -21,16 +21,23 @@ class Fruit {
 class MainSDLWindow {
 	+MainSDLWindow()
 	+~MainSDLWindow()
-	+GetPlaygroundZone() : SDL_Rect
-	+GetScoreZone() : SDL_Rect
-	-playground : SDL_Rect
+	-playground : Playground*
+	-playgroundGraphics : PlaygroundRenderer*
+	-playgroundZone : SDL_Rect
 	-scoreZone : SDL_Rect
-	+GetRenderer() : SDL_Renderer*
 	-renderer : SDL_Renderer*
 	-window : SDL_Window*
-	+GetWindowHeight() : int
-	+GetWindowWidth() : int
+	-score : Score*
+	-scoreGraphics : ScoreRenderer*
+	-mainSnake : Snake*
+	-outsideMainLoopFont : TTF_Font*
+	-outsideMainLoopSmallFont : TTF_Font*
+	-pixelizedFont : TTF_Font*
+	-HandleMainLoopEvents() : bool
+	-ShowGameOver() : bool
+	-WaitForPlayerReady() : bool
 	+Init(const char* window_name, int width, int height) : int
+	+Run() : void
 }
 
 
@@ -55,22 +62,29 @@ class PlaygroundRenderer {
 	+~PlaygroundRenderer()
 	-playground : Playground*
 	-drawZone : SDL_Rect
+	-maxDrawZone : SDL_Rect
 	-renderer : SDL_Renderer*
 	-LoadTexture(const std::string* filename) : SDL_Texture*
 	-bgTexture : SDL_Texture*
+	-crazySnakeHeadTextures : SDL_Texture*
+	-fruitsTextures : SDL_Texture*
 	-snakeBodyTextures : SDL_Texture*
 	-snakeHeadTextures : SDL_Texture*
 	-snakeTailTextures : SDL_Texture*
-	+Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground) : int
-	-InitBackground() : int
+	-tilesTextures : SDL_Texture*
+	-GenerateBackground() : int
+	+Init(SDL_Renderer* renderer, SDL_Rect drawZone) : int
+	-InitFruitsTextures() : int
 	-InitSnakeTextures() : int
+	-InitTilesTextures() : int
 	-tileSize : int
-	+draw(Playground* playground) : void
+	+SetPlayground(Playground* playground) : void
+	+draw() : void
 	-drawBackground() : void
 	-drawFruit(Fruit* fruitToDraw) : void
 	-drawSnake(Snake* snakeToDraw) : void
 	-drawSnakeBodySegment(Segment* segment) : void
-	-drawSnakeHead(Segment* segment) : void
+	-drawSnakeHead(Segment* segment, bool snakeIsCrazy) : void
 	-drawSnakeTail(Segment* segment) : void
 }
 
@@ -92,9 +106,13 @@ class ScoreRenderer {
 	+~ScoreRenderer()
 	-drawZone : SDL_Rect
 	-renderer : SDL_Renderer*
+	-iconsTextures : SDL_Texture*
+	-score : Score*
 	-police : TTF_Font*
 	+Init(SDL_Renderer* renderer, SDL_Rect drawZone) : int
-	+draw(Score* score) : void
+	-InitIconsTextures() : int
+	+SetScore(Score* score) : void
+	+draw() : void
 }
 
 
@@ -121,10 +139,13 @@ class Snake {
 	+GetHead() : Segment*
 	-head : Segment*
 	+Eat(Fruit* fruitToEat, Score* score, int* framerate) : bool
+	+IsCrazy() : bool
 	+Move(Playground* playground, Score* score, int* framerate) : bool
+	-crazy : bool
 	+occupiesTile(int row, int col) : bool
 	-length : int
 	+ChangeDirection(Direction newDirection) : void
+	+SetCrazy(bool crazy) : void
 }
 
 
@@ -147,6 +168,7 @@ enum Direction {
 enum FruitEffect {
 	BONUS
 	COUNT
+	INVERSE
 	SHRINK
 	SPEEDUP
 }
@@ -165,6 +187,21 @@ enum FruitEffect {
 .Fruit *-- .FruitEffect
 
 
+.MainSDLWindow o-- .Playground
+
+
+.MainSDLWindow o-- .PlaygroundRenderer
+
+
+.MainSDLWindow o-- .Score
+
+
+.MainSDLWindow o-- .ScoreRenderer
+
+
+.MainSDLWindow o-- .Snake
+
+
 .Playground o-- .Fruit
 
 
@@ -172,6 +209,9 @@ enum FruitEffect {
 
 
 .PlaygroundRenderer o-- .Playground
+
+
+.ScoreRenderer o-- .Score
 
 
 .Segment *-- .Direction

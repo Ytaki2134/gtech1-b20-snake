@@ -7,6 +7,9 @@ ScoreRenderer::ScoreRenderer(){
     renderer = NULL;
 }
 
+ScoreRenderer::~ScoreRenderer(){
+}
+
 int ScoreRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone){
     this->renderer = renderer;
     this->drawZone = drawZone;
@@ -45,11 +48,12 @@ int ScoreRenderer::InitIconsTextures(){
     return EXIT_SUCCESS;
 }
 
-ScoreRenderer::~ScoreRenderer(){
+void ScoreRenderer::SetScore(Score* score){
+    this->score = score;
 }
 
 //dessine toute la partie score de l'écran 
-void ScoreRenderer::draw(Score* score){
+void ScoreRenderer::draw(){
     SDL_RenderSetViewport(renderer, &drawZone);
     SDL_SetRenderDrawColor(renderer, 0, 128, 0, 255);
     SDL_RenderFillRect(renderer, &drawZone);

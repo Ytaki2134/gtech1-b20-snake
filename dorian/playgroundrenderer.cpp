@@ -46,7 +46,7 @@ PlaygroundRenderer::~PlaygroundRenderer(){
 }
 
 //dessine le cadrillage, le fruit et le snake.
-void PlaygroundRenderer::draw(Playground* playground){
+void PlaygroundRenderer::draw(){
     drawBackground();
     drawFruit(playground->GetFruit());
     drawSnake(playground->GetSnake());
@@ -101,21 +101,9 @@ void PlaygroundRenderer::drawSnakeTail(Segment* segment){
 }
 
 //initialise toutes les valeurs requises au fonctionnement du PlaygroundRenderer
-int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground){
+int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone){
     this->renderer = renderer;
-    this->drawZone = drawZone;
-    this->playground = playground;
-
-    //calcule la tileSize en fonction du nombre de col/rows et de la width/height de la drawzone du playground
-    int tileWidth = floor(drawZone.w/playground->GetNbCols());
-    int tileHeight = floor(drawZone.h/playground->GetNbRows());
-    this->tileSize = std::min(tileHeight,tileWidth);
-    
-    //change la drawzone pour qu'elle soit de la bonne taille et la place au milieu de l'écran
-    this->drawZone.w = tileSize * playground->GetNbCols();
-    this->drawZone.h = tileSize * playground->GetNbRows();
-    this->drawZone.y += (drawZone.h - this->drawZone.h) / 2;
-    this->drawZone.x += (drawZone.w - this->drawZone.w) / 2;
+    this->maxDrawZone = drawZone;
 
     bool initSnakeTexturesFailed = InitSnakeTextures();
     if (initSnakeTexturesFailed){
@@ -132,12 +120,25 @@ int PlaygroundRenderer::Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playgrou
         return EXIT_FAILURE;
     }
 
-    bool initBackgroundFailed = InitBackground();
-    if (initBackgroundFailed){
-        return EXIT_FAILURE;
-    }
-
     return EXIT_SUCCESS;
+}
+
+void PlaygroundRenderer::SetPlayground(Playground* playground)
+{
+    this->playground = playground;
+
+    //calcule la tileSize en fonction du nombre de col/rows et de la width/height de la drawzone du playground
+    int tileWidth = floor(maxDrawZone.w/playground->GetNbCols());
+    int tileHeight = floor(maxDrawZone.h/playground->GetNbRows());
+    this->tileSize = std::min(tileHeight,tileWidth);
+    
+    //change la drawzone pour qu'elle soit de la bonne taille et la place au milieu de l'écran
+    this->drawZone.w = tileSize * playground->GetNbCols();
+    this->drawZone.h = tileSize * playground->GetNbRows();
+    this->drawZone.y = maxDrawZone.y + (maxDrawZone.h - this->drawZone.h) / 2;
+    this->drawZone.x = maxDrawZone.x + (maxDrawZone.w - this->drawZone.w) / 2;
+
+    GenerateBackground();
 }
 
 //load une image à partir d'un nom de fichier et renvoie la texture créée à partir de cette dernière
@@ -155,7 +156,7 @@ SDL_Texture* PlaygroundRenderer::LoadTexture(const std::string* filename){
 }
 
 //dessine le cadrillage sur une texture et enregistre cette dernière dans l'attribut bgTexture
-int PlaygroundRenderer::InitBackground(){
+int PlaygroundRenderer::GenerateBackground(){
     srand(time(NULL));
     SDL_Texture* randomTileTexture;
 

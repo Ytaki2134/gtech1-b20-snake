@@ -12,11 +12,13 @@ class PlaygroundRenderer{
         PlaygroundRenderer();
         ~PlaygroundRenderer();
 
-        int Init(SDL_Renderer* renderer, SDL_Rect drawZone, Playground* playground);
-        void draw(Playground* playground);
+        int Init(SDL_Renderer* renderer, SDL_Rect drawZone);
+        
+        void SetPlayground(Playground* playground);
+        void draw();
 
     private:
-        int InitBackground();
+        int GenerateBackground();
         int InitSnakeTextures();
         int InitFruitsTextures();
         int InitTilesTextures();
@@ -31,6 +33,7 @@ class PlaygroundRenderer{
         void drawSnakeTail(Segment* segment);
 
     private:
+        SDL_Rect maxDrawZone;
         SDL_Rect drawZone;
         Playground* playground;
         SDL_Renderer* renderer;

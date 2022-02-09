@@ -10,7 +10,6 @@ Playground::Playground(int nbRows, int nbCols, Snake* snake){
 }
 
 Playground::~Playground(){
-
 }
 
 int Playground::GetNbCols(){

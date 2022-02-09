@@ -4,6 +4,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+class ScoreRenderer;
+class PlaygroundRenderer;
+class Snake;
+class Playground;
+class Score;
+
 class MainSDLWindow{
     public:
         MainSDLWindow(void);
@@ -12,16 +18,29 @@ class MainSDLWindow{
 
         int Init(const char* window_name, int width, int height);
 
-        SDL_Renderer* GetRenderer(void);
-        SDL_Rect GetPlaygroundZone(void);
-        SDL_Rect GetScoreZone(void);
-        int GetWindowWidth(void);
-        int GetWindowHeight(void);
+        void Run();
+
+    private:
+        bool HandleMainLoopEvents();
+
+        bool WaitForPlayerReady();
+        bool ShowGameOver();
+
     private:
         SDL_Window* window;
         SDL_Renderer* renderer;
         SDL_Rect scoreZone;
-        SDL_Rect playground;
+        SDL_Rect playgroundZone;
+        TTF_Font* outsideMainLoopFont;
+        TTF_Font* outsideMainLoopSmallFont;
+        TTF_Font* pixelizedFont;
+
+        ScoreRenderer* scoreGraphics;
+        PlaygroundRenderer* playgroundGraphics;
+
+        Snake* mainSnake;
+        Playground* playground;
+        Score* score;
 };
 
 #endif

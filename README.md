@@ -20,5 +20,5 @@ To start playing, make sure you are in the directory of the game and type `./sna
 
 Once you are in game, you can control the direction in which the snake is moving using the directional arrows keys. 
 Your goal is to get as much points as possible without hitting the borders of the game or the body of your snake. 
-To get points faster, you can eat the red fruits to grow bigger, but be carefull since it will make surviving harder !
-There is also a kaki fruit which makes your snake shrink and a yellow one that makes your snake move faster.
+To get points faster, you can eat the red candy to grow bigger, but be carefull since it will make surviving harder !
+There is also a green candy which makes your snake shrink, a yellow one that makes your snake move faster and one with spirals that inverts your controls.
