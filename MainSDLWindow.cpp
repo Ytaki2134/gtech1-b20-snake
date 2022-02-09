@@ -24,30 +24,30 @@ MainSDLWindow::~MainSDLWindow(void){
     SDL_Quit();
 }
 
-//initialise tous les attributs de la MainSDLWindow
+//initializes every attribute of MainSDLWindow
 int MainSDLWindow::Init(const char* window_name, int width, int height){
     scoreZone = {0, 0, width, ((height/10)*1)};
     playgroundZone = {0, ((height/10)*1), width, ((height/10)*9)};
 
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
-       printf("Erreur d'initialisation de la SDL : %s\n", SDL_GetError());
+       printf("SDL initialization failed : %s\n", SDL_GetError());
        return EXIT_FAILURE;
     }
 
     if(TTF_Init()==-1) {
-        printf("Erreur TTF_Init: %s\n", TTF_GetError());
+        printf("TTF initialization failed: %s\n", TTF_GetError());
         return EXIT_FAILURE;
     }
 
     window = SDL_CreateWindow(window_name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
     if (window == NULL) {
-        printf("Erreur lors de la creation d'une fenetre : %s\n", SDL_GetError());
+        printf("Window creation failed : %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
     renderer = SDL_CreateRenderer(window, -1 , SDL_RENDERER_PRESENTVSYNC);
     if(renderer == NULL) {
-        printf("Erreur lors de la creation d'un renderer : %s\n",SDL_GetError());
+        printf("Renderer creation failed : %s\n",SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -63,19 +63,19 @@ int MainSDLWindow::Init(const char* window_name, int width, int height){
 
     outsideMainLoopFont = TTF_OpenFont("fonts/arial.ttf", 64);
     if(outsideMainLoopFont == NULL){
-        printf("Erreur lors de la lecture d'une font : %s\n",SDL_GetError());
+        printf("font import failed (1) : %s\n",SDL_GetError());
         return EXIT_FAILURE;
     }
 
     outsideMainLoopSmallFont = TTF_OpenFont("fonts/arial.ttf", 32);
     if(outsideMainLoopSmallFont == NULL){
-        printf("Erreur lors de la lecture d'une font : %s\n",SDL_GetError());
+        printf("font import failed (2) : %s\n",SDL_GetError());
         return EXIT_FAILURE;
     }
 
     pixelizedFont = TTF_OpenFont("fonts/pixel.ttf", 64);
     if(pixelizedFont == NULL){
-        printf("Erreur lors de la lecture d'une font : %s\n",SDL_GetError());
+        printf("font import failed (3) : %s\n",SDL_GetError());
         return EXIT_FAILURE;
     }
 
@@ -141,20 +141,19 @@ void MainSDLWindow::Run(){
 
             SDL_RenderPresent(renderer);
             
-            // si la frame est allée plus vite que le framerate, on attend jusqu'à arriver à framerate, faisant en sorte que
-            // chacune de nos frame ait la même durée
+            //If frame is faster than framerate, we wait until we reach framerate so each frame has the same duration//
             int timeSinceFrameStart = SDL_GetTicks() - frameTimeStart;
             if (timeSinceFrameStart < framerate){
                 SDL_Delay(framerate - timeSinceFrameStart);
             }
         }
 
-        ///////////////////
-        //ECRAN GAME OVER//
-        ///////////////////
+        ////////////////////
+        //GAME OVER SCREEN//
+        ////////////////////
         replayingGame = ShowGameOver();
 
-        //supression objets aloués  
+        //Object memory wipe  
         delete mainSnake;
         delete playground;
         delete score;
@@ -268,7 +267,7 @@ bool MainSDLWindow::ShowGameOver(){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    // game over text
+    //Game Over text
     SDL_Surface* gameOverSurface = TTF_RenderText_Blended(pixelizedFont, "Game Over !", {255, 0, 0, 255});
     SDL_Texture* gameOverText = SDL_CreateTextureFromSurface(renderer, gameOverSurface);
     SDL_FreeSurface(gameOverSurface);
@@ -277,7 +276,7 @@ bool MainSDLWindow::ShowGameOver(){
     gameOverPlacement.x = (windowWidth-gameOverPlacement.w)/2;
     gameOverPlacement.y = windowHeight/4;
     
-    //score text
+    //Score text
     std::string endScoreString = std::string("Your final score is : " + std::to_string(score->getScore()));
     SDL_Surface* endScoreSurface = TTF_RenderText_Blended(outsideMainLoopSmallFont, endScoreString.c_str(), {255, 255, 255, 255});
     SDL_Texture* endScoreText = SDL_CreateTextureFromSurface(renderer, endScoreSurface);
@@ -287,7 +286,7 @@ bool MainSDLWindow::ShowGameOver(){
     endScorePlacement.x = (windowWidth-endScorePlacement.w)/2;
     endScorePlacement.y = gameOverPlacement.y + endScorePlacement.h + windowHeight/10;
 
-    //replay text & buttons
+    //Replay text & buttons
     SDL_Surface* endReplaySurface = TTF_RenderText_Blended(outsideMainLoopSmallFont, "Want to play again ?", {255, 255, 255, 255});
     SDL_Texture* endReplayText = SDL_CreateTextureFromSurface(renderer, endReplaySurface);
     SDL_FreeSurface(endReplaySurface);
@@ -296,7 +295,7 @@ bool MainSDLWindow::ShowGameOver(){
     endReplayPlacement.x = (windowWidth-endReplayPlacement.w)/2;
     endReplayPlacement.y = endScorePlacement.y + endReplayPlacement.h + windowHeight/8;
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //couleur background des boutons
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); //Background colors for buttons
     SDL_Surface* endYesSurface = TTF_RenderText_Blended(pixelizedFont, "Yes", {0, 255, 0, 255});
     SDL_Texture* endYesText = SDL_CreateTextureFromSurface(renderer, endYesSurface);
     SDL_FreeSurface(endYesSurface);

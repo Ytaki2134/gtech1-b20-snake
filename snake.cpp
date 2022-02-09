@@ -4,12 +4,12 @@
 #include "MainSDLWindow.hpp"
 #include "playground.hpp"
 
-//retourne un bool qui est true si la direction donnée est une direction combinée (exemple UPLEFT) et false dans le cas contraire
+//Returns true boolean if direction is a combination (example Up-Left) and false otherwise
 bool isCombinedDirection(Direction direction){
     return direction != RIGHT && direction != LEFT && direction != UP && direction != DOWN;
 }
 
-//retourne un bool qui représente le fait que les deux directions soient sur le même axe (donc qu'elles sont opposées) ou non
+//Returns a boolean representing the fact that two directions are on the same axis
 bool onSameAxis(Direction firstDirection, Direction secondDirection){
     return (firstDirection == RIGHT && secondDirection == LEFT) 
            || (firstDirection == LEFT && secondDirection == RIGHT)
@@ -17,8 +17,8 @@ bool onSameAxis(Direction firstDirection, Direction secondDirection){
            || (firstDirection == DOWN && secondDirection == UP);
 }
 
-//combine deux directions pour créer une direction dont le sens est firstDirection -> secondDirection
-//cette direction combinée sert à représenter les angles du snake lors du dessin
+/*Combines two direction to create a new direction such as firstDirection -> secondDirection
+This combined direction is used to display angle turn textures for snake sprite*/
 Direction CombinedDirection(Direction firstDirection, Direction secondDirection){
     if(firstDirection == secondDirection){
         return firstDirection;
@@ -66,13 +66,13 @@ Direction CombinedDirection(Direction firstDirection, Direction secondDirection)
             break;
     }
 
-    //gestion des erreurs
+    //Error managment
     if(onSameAxis(firstDirection, secondDirection)){
-        printf("Erreur combinaison de direction : les deux directions sont opposées");
+        printf("Direction combination failed : directions are opposite");
     }
 
     if(isCombinedDirection(firstDirection) || isCombinedDirection(secondDirection)){
-        printf("Erreur combinaison de direction : une des deux direction est déjà une combinaison");
+        printf("Direction combination failed : one of the directions is already in the combination");
     }
 
     return firstDirection;
@@ -113,14 +113,14 @@ void Segment::SetDirection(Direction newDirection){
     direction = newDirection;
 }
 
-//crée la liste chaînée qui représente le serpent en partant de sa queue
+//Creates a chained list which represents the snake starting from his tail
 Snake::Snake(int startingRow, int startingCol, Direction startingDirection, int length){
     this->length = std::max(2, length);
     this->directionToMove = startingDirection;
     this->crazy = false;
 
     Segment* segment = NULL;
-    // on part de la queue du serpent jusqu'à l'avant dernier segment (le dernier étant la tête)
+    //goes from snake's tail to before last segment (last one is the head)
     for(int i=this->length-1;i>0;i--){
         switch (startingDirection){
             case RIGHT:
@@ -145,22 +145,19 @@ Snake::~Snake(){
 
 }
 
-//change la direction du serpent en changeant la direction de sa tête, à part si cette direction amenerait le serpent à
-//se trourner de 180°
+//Changes snake's direction by changing head's direction, except if direction is opposite from the current one//
 void Snake::ChangeDirection(Direction newDirection){
     if(!onSameAxis(newDirection, directionToMove)){
         directionToMove = newDirection;
     }
 }
 
-//fait avancer le serpent dans la direction de la tête et effectue les actions résultantes de ce déplacement
-//(game over à cause de colision, manger fruit)
+//Makes the snake go forward in head's direction
+//(Game over if collision, eat fruit function)
 bool Snake::Move(Playground* playground, Score* score, int* framerate){
     Segment* previousHead = head;
 
-    //on va créer un nouveau segment une case plus loin dans la direction de la tête, mais avant de faire cela
-    //on vérifie si ce nouveau segment a une position amenant à une défaite (bords du playground ou segment du serpent)
-    //si c'est le cas on retourne false pour que la partie se termine.
+    //Creating new segment in head's direction if movement is leading to Game Over, otherwise we return false and the game ends//
     switch (directionToMove){
         case RIGHT:
             if(head->GetCol() == playground->GetNbCols()-1 || this->occupiesTile(head->GetRow(), head->GetCol()+1)){
@@ -188,22 +185,21 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
             break;
     }
 
-    //on fait une "combinaison" de la direction de la nouvelle tête et de la nouvelle tête et on donne cette combinaison comme direction de l'ancienne tête
-    //cette combinaison de direction sert lors du graphisme à représenter les angles
-    //si jamais la direction n'a pas changé la combinaison ne change rien
+    /*Makes a combination of previous head's direction and new head's direction before applying it to previous head's direction.
+    This combination is used to render snake angle turn sprites, if direction hasn't changed it does nothing*/
     previousHead->SetDirection(CombinedDirection(previousHead->GetDirection(), head->GetDirection()));
 
     bool snakeIsGrowing = false;
-    // si la nouvelle tête du serpent est sur un fruit, il le mange 
+    //If new head collides with a fruit, the snake eats it and grows
     if (head->GetRow() == playground->GetFruit()->GetRow() && head->GetCol() == playground->GetFruit()->GetCol())
     {
         snakeIsGrowing = Eat(playground->GetFruit(), score, framerate);
         playground->SetFruit(NULL);
     }
 
-    //avec la création de la nouvelle tête, le serpent a grandit de 1. Si on veut seulement se déplacer, il faut alors
-    //supprimer un segment quelque part. Les segments les plus facile à supprimer sont la queue et la tête
-    //or on ne veut pas supprimer la tête donc on supprime la queue.
+    /*Before new head creation, snake grows by 1.
+    To move need to delete a segment, the easiest one to delete being the tail and the head.
+    In this case we chose to delete the tail since we want to keep the head*/
     if (!snakeIsGrowing)
     {
         Segment* actualSegment = head;
@@ -223,20 +219,20 @@ bool Snake::Move(Playground* playground, Score* score, int* framerate){
     return true;
 }
 
-/* mange un fruit, activant son effet et le faisant disparaître */
+//Eats a fruit, triggers its effect and deletes it from playground
 bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
     bool snakeGrows = false;
 
 
     switch(fruitToEat->GetEffect()){
-        //agrandis le serpent de 1 et rajoute 1 au score des fruits mangés
+        //Makes snake grow by 1 and adds 1 to fruits eaten in Score
         case BONUS:
             score->update_numb_eaten(1);
             snakeGrows = true;
             length ++;
             break;
             
-        //fait retrécir le serpent de 1
+        //Makes snake shrink by 1
         case SHRINK:
         {
             if(length == 2){
@@ -244,7 +240,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
             }
             Segment* actualSegment = head;
             Segment* previousSegment = NULL;
-            //parcourir le serpent jusqu'à la queue
+            //Checks each segments up until the tail
             while (actualSegment->GetNext() != NULL)
             {
                 previousSegment = actualSegment;
@@ -256,7 +252,7 @@ bool Snake::Eat(Fruit* fruitToEat, Score* score, int* framerate){
             break;
         }
 
-        //augmente la vitesse du serpent
+        //Increases snake speed
         case SPEEDUP:
             if(*framerate > 20){
                 *framerate -= 5;
@@ -277,12 +273,11 @@ Segment* Snake::GetHead(){
     return head;
 }
 
-//parcours le serpent pour savoir si le serpent contient un segment de coordonnées row et col
+//Checks each segment to know if one of them contains coordinates equal to row and col
 bool Snake::occupiesTile(int row, int col){
     Segment* actualSegment = head;
 
-    //parcourir tout le serpent et comparer les coordonnées de chaque segment avec les coordonnées données
-    while (actualSegment != NULL)
+    //Check each segment and compares coordinates from each segment with given coordinates
     {
         if (actualSegment->GetCol() == col && actualSegment->GetRow() == row)
         {

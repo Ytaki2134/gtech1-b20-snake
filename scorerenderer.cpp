@@ -35,13 +35,13 @@ int ScoreRenderer::InitIconsTextures(){
         const std::string imageName = iconsTexturesName[i];
         SDL_Surface* iconSurface = SDL_LoadBMP(imageName.c_str());
         if(iconSurface == NULL){
-            printf("Problem with loading image: %s\n", SDL_GetError());
+            printf("Image loading failed: %s\n", SDL_GetError());
             return EXIT_FAILURE;
         }
 
         iconsTextures[i] = SDL_CreateTextureFromSurface(renderer, iconSurface);
         if(iconsTextures[i] == NULL){
-            printf("Problem with creating texture: %s\n", SDL_GetError());
+            printf("Texture creating failed: %s\n", SDL_GetError());
             return EXIT_FAILURE;
         }
     }
@@ -52,13 +52,13 @@ void ScoreRenderer::SetScore(Score* score){
     this->score = score;
 }
 
-//dessine toute la partie score de l'écran 
+//Draws Score part of the screen
 void ScoreRenderer::draw(){
     SDL_RenderSetViewport(renderer, &drawZone);
     SDL_SetRenderDrawColor(renderer, 0, 128, 0, 255);
     SDL_RenderFillRect(renderer, &drawZone);
 
-    //dessine le nombre de fruit mangé ainsi que une petite image du fruit bonus sur le coté gauche de ce nombre
+    //Displays number of fruit eaten
     std::string numberEatenString = std::to_string(score->getNumberEaten());
     SDL_Surface* numbEatenSurface = TTF_RenderText_Blended(police, numberEatenString.c_str(), {255, 255, 255, 255});
     SDL_Texture* numbEatenTexture = SDL_CreateTextureFromSurface(renderer, numbEatenSurface);
@@ -68,12 +68,12 @@ void ScoreRenderer::draw(){
     numbEatenPlacement.y = (drawZone.h - numbEatenPlacement.h)/2;
     SDL_RenderCopy(renderer, numbEatenTexture, NULL, &numbEatenPlacement);
 
-    //petite image du fruit
+    //Fruit picture
     numbEatenPlacement.x -= drawZone.w/20;
     numbEatenPlacement.w = drawZone.w/25;
     SDL_RenderCopy(renderer, iconsTextures[0], NULL, &numbEatenPlacement);
 
-    //dessine le score et une petite image de trophée coté gauche
+    //Displays score
     std::string scoreString = std::to_string(score->getScore());
     SDL_Surface* scoreSurface = TTF_RenderText_Blended(police, scoreString.c_str(), {255, 255, 255, 255});
     SDL_Texture* scoreTexture = SDL_CreateTextureFromSurface(renderer, scoreSurface);
@@ -84,7 +84,7 @@ void ScoreRenderer::draw(){
     scorePlacement.y = (drawZone.h - numbEatenPlacement.h)/2;
     SDL_RenderCopy(renderer, scoreTexture, NULL, &scorePlacement);
 
-    //image trophée
+    //Trophy picture
     scorePlacement.x -= drawZone.w/20;
     scorePlacement.w = drawZone.w/25;
     SDL_RenderCopy(renderer, iconsTextures[1], NULL, &scorePlacement);

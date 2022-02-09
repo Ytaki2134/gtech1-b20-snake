@@ -17,7 +17,7 @@ PlaygroundRenderer::PlaygroundRenderer(){
 
 PlaygroundRenderer::~PlaygroundRenderer(){
     
-    //detruire toutes les textures des différents tableaux de textures du serpent
+    //Destroy every texture of snake texture arrays
     for(int i=0; i<sizeof(snakeHeadTextures) / sizeof(snakeHeadTextures[0]);i++){
         SDL_DestroyTexture(snakeHeadTextures[i]);
     }
@@ -34,25 +34,24 @@ PlaygroundRenderer::~PlaygroundRenderer(){
         SDL_DestroyTexture(snakeBodyTextures[i]);
     }
 
-    //detruire les textures des fruits
+    //Destroy fruit textures
     for(int i=0; i<sizeof(fruitsTextures) / sizeof(fruitsTextures[0]);i++){
         SDL_DestroyTexture(fruitsTextures[i]);
     }
 
-    //detruire les textures des tiles
+    //Destroy tiles textures
     for(int i=0; i<sizeof(tilesTextures) / sizeof(tilesTextures[0]);i++){
         SDL_DestroyTexture(tilesTextures[i]);
     }
 }
 
-//dessine le cadrillage, le fruit et le snake.
+//Draws grid, fruit and snake
 void PlaygroundRenderer::draw(){
     drawBackground();
     drawFruit(playground->GetFruit());
     drawSnake(playground->GetSnake());
 }
 
-//dessine le cadrillage
 void PlaygroundRenderer::drawBackground(){
     SDL_RenderCopy(renderer, bgTexture, NULL, &drawZone);
 }
@@ -61,7 +60,6 @@ void PlaygroundRenderer::drawFruit(Fruit* fruitToDraw){
     SDL_RenderSetViewport(renderer, &drawZone);
     SDL_Rect fruitRect = {fruitToDraw->GetCol() * tileSize, fruitToDraw->GetRow() * tileSize, tileSize, tileSize};
 
-    //on utilise le fait que les valeurs des effets FruitEffect s'incrémentent à partir de 0 comme les index d'un tableau 
     SDL_RenderCopy(renderer, fruitsTextures[fruitToDraw->GetEffect()], NULL, &fruitRect);
 }
 

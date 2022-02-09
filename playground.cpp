@@ -32,14 +32,14 @@ void Playground::SetFruit(Fruit* newFruit){
     presentFruit = newFruit;
 }
 
-//crée un nouveau fruit avec des attributs aléatoire
+//Creates new fruit with random attributes
 void Playground::SpawnFruit(){
     srand(time(NULL));
 
     FruitEffect randomEffect;
     int randomEffectNumber = (rand()%10) + 1;
 
-    //10% de chance d'obtenir un fruit special puisque on peut avoir les chiffres de 1 à 10
+    //10% chance to get a special fruit
     if(randomEffectNumber == 10){
         randomEffect = static_cast<FruitEffect>((rand()% (COUNT-1)) + 1);
     }
@@ -47,8 +47,7 @@ void Playground::SpawnFruit(){
         randomEffect = BONUS;
     }
     
-    //vérifier que les coordonnées créées aléatoirement sont correcte (pas sur le serpent) et si ce n'est pas le cas
-    //en générer de nouvelles
+    //Check if random coordinates doesn't collide with anything, if it does it tries again with new ones
     int randomCol = rand()%nbCols;
     int randomRow = rand()%nbRows;
     while(snake->occupiesTile(randomRow, randomCol))
@@ -57,7 +56,7 @@ void Playground::SpawnFruit(){
         randomRow = rand()%nbRows;
     }
     
-    //si on est sorti de la boucle while alors les coordonnées sont correctes donc on peut créer la pomme
+    //If fruit coordinates doesn't collide with anything, we can make the fruit appear
     presentFruit = new Fruit(randomRow, randomCol, randomEffect);
 }
 
