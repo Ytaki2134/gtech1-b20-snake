@@ -1,8 +1,8 @@
 CC=g++
 # Adapt the variables below to your needs:
 EXE=snake
-CPP=dorian/main.cpp dorian/MainSDLWindow.cpp dorian/playground.cpp dorian/snake.cpp dorian/playgroundrenderer.cpp dorian/score.cpp dorian/scorerenderer.cpp dorian/fruits.cpp
-HPP=dorian/MainSDLWindow.hpp dorian/playground.hpp dorian/snake.hpp dorian/playgroundrenderer.hpp dorian/score.hpp dorian/scorerenderer.hpp dorian/fruits.hpp
+CPP= main.cpp MainSDLWindow.cpp playground.cpp snake.cpp playgroundrenderer.cpp score.cpp scorerenderer.cpp fruits.cpp
+HPP= MainSDLWindow.hpp playground.hpp snake.hpp playgroundrenderer.hpp score.hpp scorerenderer.hpp fruits.hpp
 
 # The default is build the executable file:
 default: $(EXE)
